@@ -6,25 +6,22 @@
     <title>MÎK AI Professional</title>
     <style>
         :root { --primary: #00ff99; --bg: #050505; --card: #141414; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header & Voice Menu */
         header { padding: 15px; background: #0a0a0a; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         header h1 { margin: 0; color: var(--primary); font-size: 18px; letter-spacing: 1px; }
-        .voice-settings { background: #1a1a1a; color: white; border: 1px solid #333; padding: 5px; border-radius: 8px; font-size: 12px; outline: none; }
+        .voice-settings { background: #1a1a1a; color: white; border: 1px solid #333; padding: 5px; border-radius: 8px; font-size: 12px; outline: none; max-width: 150px; }
 
-        /* Chat Area */
         #chat { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 15px; animation: fadeInUp 0.3s ease forwards; position: relative; }
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 15px; animation: fadeInUp 0.3s ease forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .user { background: var(--primary); color: black; align-self: flex-end; border-bottom-right-radius: 2px; box-shadow: 0 4px 10px rgba(0, 255, 153, 0.2); }
+        .user { background: var(--primary); color: black; align-self: flex-end; border-bottom-right-radius: 2px; }
         .ai { background: var(--card); color: white; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #222; }
 
-        /* Input Bar */
         #input-box { padding: 15px; background: #0a0a0a; display: flex; gap: 10px; border-top: 1px solid #222; align-items: center; }
         textarea { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; padding: 12px 18px; color: white; outline: none; resize: none; font-size: 15px; height: 45px; }
-        .btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; }
+        .btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .btn-mic { background: #222; color: white; }
         .btn-mic.active { background: #ff4444; animation: pulse 1.5s infinite; }
         .btn-send { background: var(--primary); color: black; }
@@ -33,17 +30,15 @@
 </head>
 <body>
     <header>
-        <h1>MÎK AI PRO</h1>
-        <select id="voiceSelect" class="voice-settings">
-            <option value="">Loading Voices...</option>
-        </select>
+        <h1>MÎK AI</h1>
+        <select id="voiceSelect" class="voice-settings"><option value="">Loading Voices...</option></select>
     </header>
 
     <div id="chat"></div>
 
     <div id="input-box">
         <button id="micBtn" class="btn btn-mic" onclick="toggleMic()">🎙️</button>
-        <textarea id="msg" placeholder="Message MÎK AI..."></textarea>
+        <textarea id="msg" placeholder="Type or speak to MÎK AI..."></textarea>
         <button class="btn btn-send" onclick="send()">🚀</button>
     </div>
 
@@ -52,70 +47,63 @@
         const msgInput = document.getElementById("msg");
         const voiceSelect = document.getElementById("voiceSelect");
         const micBtn = document.getElementById("micBtn");
-        
         let synth = window.speechSynthesis;
         let voices = [];
 
-        // 🔊 LOAD VOICES & FILTER MALE/FEMALE
+        // 1. VOICES SETUP
         function loadVoices() {
             voices = synth.getVoices();
             voiceSelect.innerHTML = '';
-            
             voices.forEach((voice, i) => {
                 const option = document.createElement('option');
                 option.value = i;
-                // Simple logic to help user identify gender by name
-                const gender = voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('google uk english female') ? '♀️ Female' : '♂️ Male';
+                const gender = voice.name.toLowerCase().includes('female') ? '♀️ Female' : '♂️ Male';
                 option.textContent = `${voice.name} (${gender})`;
+                if (voice.name.includes('Google UK English Female')) option.selected = true;
                 voiceSelect.appendChild(option);
             });
         }
-        
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadVoices;
-        }
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
 
-        // 🔊 AI SPEAKING FUNCTION
-        function speakText(text) {
+        function speak(text) {
             if (synth.speaking) synth.cancel();
             const utter = new SpeechSynthesisUtterance(text);
-            const selectedVoice = voices[voiceSelect.value];
-            if (selectedVoice) utter.voice = selectedVoice;
-            utter.pitch = 1;
-            utter.rate = 1;
+            utter.voice = voices[voiceSelect.value];
             synth.speak(utter);
         }
 
-        // 🎙️ VOICE RECOGNITION
+        // 2. PERSONALIZED GREETING
+        window.onload = () => {
+            setTimeout(() => {
+                let userName = localStorage.getItem("mik_user_name");
+                if (!userName) {
+                    userName = prompt("Welcome! What should MÎK AI call you?");
+                    if (userName) localStorage.setItem("mik_user_name", userName);
+                }
+                const greeting = `Assalamu Alaikum ${userName || 'Jani'}, I am MÎK AI. How can I help you today?`;
+                addMsg(greeting, "ai");
+            }, 1000);
+        };
+
+        // 3. SPEECH TO TEXT
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.lang = 'en-US';
-
             recognition.onstart = () => micBtn.classList.add('active');
             recognition.onend = () => micBtn.classList.remove('active');
-            
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                msgInput.value = text;
-                send();
-            };
+            recognition.onresult = (e) => { msgInput.value = e.results[0][0].transcript; send(); };
         }
+        function toggleMic() { recognition && (micBtn.classList.contains('active') ? recognition.stop() : recognition.start()); }
 
-        function toggleMic() {
-            if (micBtn.classList.contains('active')) recognition.stop();
-            else recognition.start();
-        }
-
+        // 4. CHAT LOGIC
         function addMsg(text, type) {
             const div = document.createElement("div");
             div.className = "msg " + type;
             div.innerText = text;
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
-            if (type === "ai" && text !== "Thinking...") speakText(text);
+            if (type === "ai" && text !== "Thinking...") speak(text);
         }
 
         async function send() {
@@ -123,12 +111,9 @@
             if (!text) return;
             addMsg(text, "user");
             msgInput.value = "";
-            
-            const loading = document.createElement("div");
-            loading.className = "msg ai";
-            loading.innerText = "Thinking...";
-            chat.appendChild(loading);
-
+            const load = document.createElement("div");
+            load.className = "msg ai"; load.innerText = "Thinking...";
+            chat.appendChild(load);
             try {
                 const res = await fetch("/chat", {
                     method: "POST",
@@ -136,14 +121,10 @@
                     body: JSON.stringify({ message: text })
                 });
                 const data = await res.json();
-                chat.removeChild(loading);
+                chat.removeChild(load);
                 addMsg(data.reply, "ai");
-            } catch (e) {
-                loading.innerText = "⚠️ System error, Jani. Try again!";
-            }
+            } catch (e) { load.innerText = "⚠️ Error connecting to brain."; }
         }
-
-        // Load voices initially
         setTimeout(loadVoices, 500);
     </script>
 </body>
