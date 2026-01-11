@@ -1,25 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>MÎK AI</title>
+  <style>
+    body {
+      background: #0b0b0b;
+      color: #00ff99;
+      font-family: monospace;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      border: 2px solid #00ff99;
+      display: inline-block;
+      padding: 10px 20px;
+    }
+    textarea {
+      width: 90%;
+      height: 80px;
+      margin-top: 20px;
+      background: black;
+      color: #00ff99;
+      border: 1px solid #00ff99;
+      padding: 10px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 25px;
+      background: #00ff99;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #reply {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      color: white;
+    }
+  </style>
 </head>
-<body style="background:black;color:#0f0;font-family:monospace">
+<body>
+
   <h1>MÎK AI 🤖</h1>
-  <input id="msg" placeholder="Type..." />
+  <p>Status: <b>24/7 Online</b></p>
+
+  <textarea id="msg" placeholder="Ask me anything, Jani..."></textarea><br>
   <button onclick="send()">Send</button>
-  <pre id="chat"></pre>
+
+  <div id="reply"></div>
 
   <script>
     async function send() {
       const msg = document.getElementById("msg").value;
+      const replyBox = document.getElementById("reply");
+
+      replyBox.innerText = "Thinking... 🤔";
+
       const res = await fetch("/chat", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ message: msg })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
       });
+
       const data = await res.json();
-      document.getElementById("chat").textContent += "\nYou: " + msg + "\nAI: " + data.reply + "\n";
+      replyBox.innerText = data.reply;
     }
   </script>
+
 </body>
 </html>
