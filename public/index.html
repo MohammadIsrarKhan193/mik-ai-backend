@@ -1,140 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MÎK AI</title>
-
-<style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #0f0f0f;
-  font-family: Arial, sans-serif;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-header {
-  padding: 15px;
-  background: #121212;
-  text-align: center;
-  border-bottom: 1px solid #222;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 20px;
-  color: #00ff99;
-}
-
-#chat {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-}
-
-.message {
-  max-width: 80%;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  line-height: 1.4;
-}
-
-.user {
-  background: #00ff99;
-  color: black;
-  align-self: flex-end;
-}
-
-.ai {
-  background: #1e1e1e;
-  color: white;
-  align-self: flex-start;
-}
-
-#inputArea {
-  display: flex;
-  padding: 10px;
-  background: #121212;
-  border-top: 1px solid #222;
-}
-
-#inputArea textarea {
-  flex: 1;
-  resize: none;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: #1e1e1e;
-  color: white;
-  font-size: 14px;
-}
-
-#inputArea button {
-  margin-left: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #00ff99;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MÎK AI Professional</title>
+    <style>
+        body { margin: 0; background: #050505; color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        header { padding: 20px; text-align: center; border-bottom: 1px solid #222; background: #0a0a0a; }
+        header h1 { margin: 0; color: #00ff99; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; }
+        #chat { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user { background: #00ff99; color: black; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai { background: #1a1a1a; color: white; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .ai img { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+        #input-box { padding: 20px; background: #0a0a0a; display: flex; gap: 10px; border-top: 1px solid #222; }
+        textarea { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; color: white; outline: none; resize: none; }
+        button { background: #00ff99; border: none; padding: 0 25px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { transform: scale(1.05); }
+    </style>
 </head>
-
 <body>
+    <header><h1>MÎK AI</h1></header>
+    <div id="chat"></div>
+    <div id="input-box">
+        <textarea id="msg" rows="1" placeholder="Ask MÎK AI anything..."></textarea>
+        <button onclick="send()">Send</button>
+    </div>
 
-<header>
-  <h1>MÎK AI</h1>
-  <small>ChatGPT-style assistant</small>
-</header>
+    <script>
+        const chat = document.getElementById("chat");
+        function addMsg(text, type, imgUrl = null) {
+            const div = document.createElement("div");
+            div.className = "msg " + type;
+            div.innerText = text;
+            if (imgUrl) {
+                const img = document.createElement("img");
+                img.src = imgUrl;
+                div.appendChild(img);
+            }
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
 
-<div id="chat"></div>
+        async function send() {
+            const input = document.getElementById("msg");
+            const text = input.value.trim();
+            if (!text) return;
+            addMsg(text, "user");
+            input.value = "";
+            
+            const loading = document.createElement("div");
+            loading.className = "msg ai";
+            loading.innerText = "Thinking...";
+            chat.appendChild(loading);
 
-<div id="inputArea">
-  <textarea id="msg" rows="1" placeholder="Message MÎK AI..."></textarea>
-  <button onclick="send()">Send</button>
-</div>
-
-<script>
-const chat = document.getElementById("chat");
-
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = "message " + type;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-async function send() {
-  const msgInput = document.getElementById("msg");
-  const text = msgInput.value.trim();
-  if (!text) return;
-
-  addMessage(text, "user");
-  msgInput.value = "";
-
-  addMessage("Typing...", "ai");
-
-  const res = await fetch("/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
-
-  const data = await res.json();
-
-  chat.lastChild.innerText = data.reply;
-}
-</script>
-
+            try {
+                const res = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await res.json();
+                chat.removeChild(loading);
+                addMsg(data.reply, "ai", data.imageUrl);
+            } catch (e) {
+                loading.innerText = "⚠️ System Error. Check Credits.";
+            }
+        }
+    </script>
 </body>
 </html>
