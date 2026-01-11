@@ -5,50 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MÎK AI Professional</title>
     <style>
-        body { margin: 0; background: #050505; color: white; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        header { padding: 20px; text-align: center; border-bottom: 1px solid #222; background: #0a0a0a; }
-        header h1 { margin: 0; color: #00ff99; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; }
-        #chat { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 80%; padding: 12px 18px; border-radius: 18px; line-height: 1.6; font-size: 15px; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .user { background: #00ff99; color: black; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .ai { background: #1a1a1a; color: white; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #333; }
-        .ai img { max-width: 100%; border-radius: 10px; margin-top: 10px; }
-        #input-box { padding: 20px; background: #0a0a0a; display: flex; gap: 10px; border-top: 1px solid #222; }
-        textarea { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; color: white; outline: none; resize: none; }
-        button { background: #00ff99; border: none; padding: 0 25px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { transform: scale(1.05); }
+        :root { --primary: #00ff99; --bg: #050505; --card: #141414; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Header & Voice Menu */
+        header { padding: 15px; background: #0a0a0a; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; color: var(--primary); font-size: 18px; letter-spacing: 1px; }
+        .voice-settings { background: #1a1a1a; color: white; border: 1px solid #333; padding: 5px; border-radius: 8px; font-size: 12px; outline: none; }
+
+        /* Chat Area */
+        #chat { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 15px; animation: fadeInUp 0.3s ease forwards; position: relative; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .user { background: var(--primary); color: black; align-self: flex-end; border-bottom-right-radius: 2px; box-shadow: 0 4px 10px rgba(0, 255, 153, 0.2); }
+        .ai { background: var(--card); color: white; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #222; }
+
+        /* Input Bar */
+        #input-box { padding: 15px; background: #0a0a0a; display: flex; gap: 10px; border-top: 1px solid #222; align-items: center; }
+        textarea { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 20px; padding: 12px 18px; color: white; outline: none; resize: none; font-size: 15px; height: 45px; }
+        .btn { width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; }
+        .btn-mic { background: #222; color: white; }
+        .btn-mic.active { background: #ff4444; animation: pulse 1.5s infinite; }
+        .btn-send { background: var(--primary); color: black; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); } }
     </style>
 </head>
 <body>
-    <header><h1>MÎK AI</h1></header>
+    <header>
+        <h1>MÎK AI PRO</h1>
+        <select id="voiceSelect" class="voice-settings">
+            <option value="">Loading Voices...</option>
+        </select>
+    </header>
+
     <div id="chat"></div>
+
     <div id="input-box">
-        <textarea id="msg" rows="1" placeholder="Ask MÎK AI anything..."></textarea>
-        <button onclick="send()">Send</button>
+        <button id="micBtn" class="btn btn-mic" onclick="toggleMic()">🎙️</button>
+        <textarea id="msg" placeholder="Message MÎK AI..."></textarea>
+        <button class="btn btn-send" onclick="send()">🚀</button>
     </div>
 
     <script>
         const chat = document.getElementById("chat");
-        function addMsg(text, type, imgUrl = null) {
+        const msgInput = document.getElementById("msg");
+        const voiceSelect = document.getElementById("voiceSelect");
+        const micBtn = document.getElementById("micBtn");
+        
+        let synth = window.speechSynthesis;
+        let voices = [];
+
+        // 🔊 LOAD VOICES & FILTER MALE/FEMALE
+        function loadVoices() {
+            voices = synth.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            voices.forEach((voice, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                // Simple logic to help user identify gender by name
+                const gender = voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('google uk english female') ? '♀️ Female' : '♂️ Male';
+                option.textContent = `${voice.name} (${gender})`;
+                voiceSelect.appendChild(option);
+            });
+        }
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // 🔊 AI SPEAKING FUNCTION
+        function speakText(text) {
+            if (synth.speaking) synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            const selectedVoice = voices[voiceSelect.value];
+            if (selectedVoice) utter.voice = selectedVoice;
+            utter.pitch = 1;
+            utter.rate = 1;
+            synth.speak(utter);
+        }
+
+        // 🎙️ VOICE RECOGNITION
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => micBtn.classList.add('active');
+            recognition.onend = () => micBtn.classList.remove('active');
+            
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                msgInput.value = text;
+                send();
+            };
+        }
+
+        function toggleMic() {
+            if (micBtn.classList.contains('active')) recognition.stop();
+            else recognition.start();
+        }
+
+        function addMsg(text, type) {
             const div = document.createElement("div");
             div.className = "msg " + type;
             div.innerText = text;
-            if (imgUrl) {
-                const img = document.createElement("img");
-                img.src = imgUrl;
-                div.appendChild(img);
-            }
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
+            if (type === "ai" && text !== "Thinking...") speakText(text);
         }
 
         async function send() {
-            const input = document.getElementById("msg");
-            const text = input.value.trim();
+            const text = msgInput.value.trim();
             if (!text) return;
             addMsg(text, "user");
-            input.value = "";
+            msgInput.value = "";
             
             const loading = document.createElement("div");
             loading.className = "msg ai";
@@ -63,11 +137,14 @@
                 });
                 const data = await res.json();
                 chat.removeChild(loading);
-                addMsg(data.reply, "ai", data.imageUrl);
+                addMsg(data.reply, "ai");
             } catch (e) {
-                loading.innerText = "⚠️ System Error. Check Credits.";
+                loading.innerText = "⚠️ System error, Jani. Try again!";
             }
         }
+
+        // Load voices initially
+        setTimeout(loadVoices, 500);
     </script>
 </body>
 </html>
