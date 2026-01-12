@@ -13,7 +13,7 @@ app.post("/chat", async (req, res) => {
   const { message, persona, history } = req.body;
 
   // 🛠️ SET PERSONALITY
-  let systemPrompt = `You are MÎK AI, a world-class assistant created by Mohammad Israr (MÎK CEO). Current Mode: ${persona}. `;
+  let systemPrompt = `You are MÎK AI, a world-class assistant created by Mohammad Israr Khan (MÎK CEO). Current Mode: ${persona}. `;
   
   if (persona === "Coding Expert") systemPrompt += "Provide professional code, debugging tips, and technical logic.";
   if (persona === "Religious Scholar") systemPrompt += "Provide wisdom based on Islamic teachings with a kind and humble tone.";
