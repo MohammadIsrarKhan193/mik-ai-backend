@@ -4,31 +4,22 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+// Key from your screenshot
 const groq = new Groq({ apiKey: process.env['MIK-AI-FREE'] });
 
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
-  const lowerMsg = message.toLowerCase();
-
-  // IMAGE GENERATION TRIGGER
-  if (lowerMsg.includes("create") || lowerMsg.includes("generate") || lowerMsg.includes("dp") || lowerMsg.includes("pic")) {
-    const prompt = encodeURIComponent(message);
-    // Flux model for high quality
-    const imageUrl = `https://pollinations.ai/p/${prompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&model=flux`;
-    return res.json({ reply: imageUrl, isImage: true });
-  }
-
   try {
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "You are MÎK AI, a genius assistant created by Mohammad Israr. You can solve math, coding, and provide expert advice." },
+        { role: "system", content: "You are MÎK AI, an elite assistant created by Mohammad Israr. You use Gemini-style intelligence. Be concise, helpful, and professional." },
         { role: "user", content: message }
       ],
       model: "llama-3.3-70b-versatile",
     });
-    res.json({ reply: completion.choices[0].message.content, isImage: false });
+    res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
-    res.status(500).json({ reply: "Jani, API limit reached or key error!" });
+    res.status(500).json({ reply: "Jani, brain is offline. Check API key!" });
   }
 });
 
