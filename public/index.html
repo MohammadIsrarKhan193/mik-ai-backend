@@ -6,43 +6,34 @@
     <title>MÎK AI - Gemini Style</title>
     <style>
         :root { --bg: #0e0e0e; --primary: #4b90ff; --text: #e3e3e3; --surface: #1e1f20; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Google Sans', sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 22px; font-weight: 500; }
-
-        /* GEMINI STYLE CENTER CONTENT */
         #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; width: 100%; }
         #welcome-screen { margin-top: 10vh; }
         .greeting { font-size: 40px; font-weight: 400; margin-bottom: 10px; background: linear-gradient(to right, #4b90ff, #ff5546); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sub-greeting { font-size: 36px; opacity: 0.5; margin-bottom: 40px; }
-
         .suggestions { display: flex; flex-direction: column; gap: 12px; }
-        .pill { background: var(--surface); padding: 18px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 15px; transition: 0.3s; border: 1px solid transparent; }
-        .pill:hover { background: #2b2c2d; border-color: #444; }
-        .pill i { font-size: 20px; }
-
-        /* INPUT BAR */
+        .pill { background: var(--surface); padding: 18px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 15px; border: 1px solid transparent; }
         #input-area { padding: 20px; position: sticky; bottom: 0; background: var(--bg); }
-        #input-wrapper { background: var(--surface); border-radius: 30px; display: flex; align-items: center; padding: 8px 20px; gap: 12px; }
+        #input-wrapper { background: var(--surface); border-radius: 30px; display: flex; align-items: center; padding: 8px 20px; gap: 12px; border: 1px solid #333; }
         #msg { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 12px 0; font-size: 16px; }
         .btn { color: #aaa; cursor: pointer; font-size: 22px; background: none; border: none; }
         .send-btn { color: var(--primary); }
-
         .ai-msg { margin-top: 30px; line-height: 1.6; }
         .user-msg { align-self: flex-end; background: #2b2c2d; padding: 12px 20px; border-radius: 20px; margin-top: 20px; }
         .ai-label { color: var(--primary); font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        
-        #plus-menu { 
-            position: absolute; bottom: 90px; left: 20px; background: #2b2c2d; 
-            border-radius: 16px; padding: 8px; display: none; flex-direction: column; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 100;
-        }
-        .menu-item { padding: 12px 20px; cursor: pointer; border-radius: 8px; }
+        #plus-menu { position: absolute; bottom: 90px; left: 20px; background: #2b2c2d; border-radius: 16px; padding: 8px; display: none; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 100; }
+        .menu-item { padding: 12px 20px; cursor: pointer; border-radius: 8px; display: flex; gap: 10px; }
         .menu-item:hover { background: #3c3e40; }
+        .loading { font-size: 12px; color: var(--primary); margin-top: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
+
+<input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(this, 'file')">
+<input type="file" id="cameraInput" style="display:none" accept="image/*" capture="environment" onchange="handleFileSelect(this, 'camera')">
 
 <header>
     <div class="logo">MÎK AI</div>
@@ -53,27 +44,26 @@
     <div id="welcome-screen">
         <div class="greeting">Hi Mohammad Israr</div>
         <div class="sub-greeting">Where should we start?</div>
-        
         <div class="suggestions">
-            <div class="pill" onclick="quickAction('Create an image of...')"><span>🎨</span> Create image</div>
-            <div class="pill" onclick="quickAction('Help me write...')"><span>📝</span> Write anything</div>
-            <div class="pill" onclick="quickAction('Help me learn...')"><span>📚</span> Help me learn</div>
+            <div class="pill" onclick="quickAction('Create a DP of...')"><span>🎨</span> Create image</div>
+            <div class="pill" onclick="quickAction('Summarize this text: ')"><span>📝</span> Summarize text</div>
+            <div class="pill" onclick="quickAction('Explain this like I am 5: ')"><span>📚</span> Help me learn</div>
         </div>
     </div>
     <div id="chat-flow"></div>
 </div>
 
 <div id="plus-menu">
-    <div class="menu-item" onclick="alert('Camera coming in Phase 2!')">📸 Camera</div>
-    <div class="menu-item" onclick="alert('Upload coming in Phase 2!')">🖼️ Photos</div>
-    <div class="menu-item" onclick="alert('PDF Intel coming in Phase 2!')">📂 Files</div>
+    <div class="menu-item" onclick="document.getElementById('cameraInput').click()">📸 Camera</div>
+    <div class="menu-item" onclick="document.getElementById('fileInput').click()">🖼️ Photos</div>
+    <div class="menu-item" onclick="document.getElementById('fileInput').click()">📂 Documents / PDF</div>
 </div>
 
 <div id="input-area">
     <div id="input-wrapper">
         <button class="btn" onclick="toggleMenu()">⊕</button>
         <input type="text" id="msg" placeholder="Ask MÎK AI...">
-        <button class="btn send-btn" onclick="send()">▲</button>
+        <button class="btn send-btn" id="sendBtn" onclick="send()">▲</button>
     </div>
 </div>
 
@@ -83,27 +73,43 @@
     const msgInput = document.getElementById("msg");
     const menu = document.getElementById("plus-menu");
 
-    function toggleMenu() {
-        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    function toggleMenu() { menu.style.display = menu.style.display === "flex" ? "none" : "flex"; }
+    function quickAction(txt) { msgInput.value = txt; msgInput.focus(); }
+
+    function handleFileSelect(input, type) {
+        const file = input.files[0];
+        if (file) {
+            welcome.style.display = "none";
+            menu.style.display = "none";
+            addMsg(`Checking ${type}: ${file.name}...`, "user");
+            setTimeout(() => {
+                addAiMsg(`Jani, I have received your ${type}. I am currently processing the data within "${file.name}". What specific question do you have about it?`);
+            }, 1000);
+        }
     }
 
-    function quickAction(txt) {
-        msgInput.value = txt;
-        msgInput.focus();
+    function addMsg(text, type) {
+        const d = document.createElement("div");
+        d.className = type === "user" ? "user-msg" : "ai-msg";
+        d.innerText = text;
+        chatFlow.appendChild(d);
+        document.getElementById("chat-container").scrollTop = document.getElementById("chat-container").scrollHeight;
+    }
+
+    function addAiMsg(text) {
+        const aiCont = document.createElement("div");
+        aiCont.className = "ai-msg";
+        aiCont.innerHTML = `<div class="ai-label">✨ MÎK AI</div><div>${text}</div>`;
+        chatFlow.appendChild(aiCont);
+        document.getElementById("chat-container").scrollTop = document.getElementById("chat-container").scrollHeight;
     }
 
     async function send() {
         const text = msgInput.value.trim();
         if(!text) return;
-        
         welcome.style.display = "none";
         menu.style.display = "none";
-        
-        // Add User Message
-        const uDiv = document.createElement("div");
-        uDiv.className = "user-msg";
-        uDiv.innerText = text;
-        chatFlow.appendChild(uDiv);
+        addMsg(text, "user");
         msgInput.value = "";
 
         try {
@@ -113,16 +119,9 @@
                 body: JSON.stringify({ message: text })
             });
             const data = await res.json();
-            
-            // Add AI Response
-            const aiCont = document.createElement("div");
-            aiCont.className = "ai-msg";
-            aiCont.innerHTML = `<div class="ai-label">✨ MÎK AI</div><div>${data.reply}</div>`;
-            chatFlow.appendChild(aiCont);
-            
-            document.getElementById("chat-container").scrollTop = document.getElementById("chat-container").scrollHeight;
+            addAiMsg(data.reply);
         } catch (e) {
-            alert("Connection error Jani!");
+            addAiMsg("Jani, connection lost! Check Render logs.");
         }
     }
 </script>
