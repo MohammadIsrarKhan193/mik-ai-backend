@@ -10,27 +10,30 @@ app.post("/chat", async (req, res) => {
   const { message } = req.body;
   const lowerMsg = message.toLowerCase();
 
-  // IMAGE GENERATION
+  // 🎨 FIXED IMAGE GENERATION LOGIC
   if (lowerMsg.includes("create") || lowerMsg.includes("generate") || lowerMsg.includes("dp") || lowerMsg.includes("pic")) {
-    const seed = Math.floor(Math.random() * 10000);
+    const seed = Math.floor(Math.random() * 99999);
     const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(message)}?width=1024&height=1024&seed=${seed}&model=flux`;
-    return res.json({ reply: `Jani, I have generated this for you: \n\n ![Image](${imageUrl})` });
+    
+    // Return structured data instead of just text
+    return res.json({ 
+      type: "image", 
+      text: "Jani, your MÎK AI has generated this masterpiece for you: ✨", 
+      image: imageUrl 
+    });
   }
 
   try {
     const completion = await groq.chat.completions.create({
       messages: [
-        { 
-          role: "system", 
-          content: "You are MÎK AI, a visionary intelligence created by Mohammad Israr. You are professional, helpful, and very fast. If someone asks about MÎK, explain it is a cutting-edge tech firm founded by Mohammad Israr." 
-        },
+        { role: "system", content: "You are MÎK AI, an elite intelligence created by Mohammad Israr. You are professional and helpful." },
         { role: "user", content: message }
       ],
       model: "llama-3.3-70b-versatile",
     });
-    res.json({ reply: completion.choices[0].message.content });
+    res.json({ type: "text", reply: completion.choices[0].message.content });
   } catch (err) {
-    res.status(500).json({ reply: "Jani, API limit reached or key missing!" });
+    res.status(500).json({ type: "text", reply: "API Key error, Jani!" });
   }
 });
 
