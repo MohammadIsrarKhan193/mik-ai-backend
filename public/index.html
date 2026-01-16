@@ -1,31 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MÎK AI</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MÎK AI v4.0</title>
+
+  <style>
+    body {
+      background: #0b0b0b;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px;
+      font-weight: bold;
+      color: #10a37f;
+      border-bottom: 1px solid #222;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      line-height: 1.5;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #2b2b2b;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background: #10a37f;
+      color: #fff;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid #222;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: #1f1f1f;
+      color: white;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #sendBtn {
+      background: #10a37f;
+      color: white;
+    }
+
+    #micBtn {
+      background: #333;
+      color: white;
+    }
+
+    #micBtn.listening {
+      background: red;
+    }
+  </style>
 </head>
+
 <body>
-
-<header>
-  <div class="logo">MÎK AI</div>
-</header>
-
-<main id="chat-container">
-  <div id="welcome">
-    <h1>Hello 👋🏻</h1>
-    <p>How can I help you today?</p>
-  </div>
+  <header>MÎK AI</header>
 
   <div id="chat"></div>
-</main>
 
-<footer>
-  <input id="input" placeholder="Message MÎK AI…" />
-  <button onclick="send()">➤</button>
-</footer>
+  <div id="input-area">
+    <button id="micBtn">🎤</button>
+    <input id="msgInput" placeholder="Message MÎK AI..." />
+    <button id="sendBtn">➤</button>
+  </div>
 
-<script src="app.js"></script>
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const micBtn = document.getElementById("micBtn");
+
+    function addMsg(text, type) {
+      const div = document.createElement("div");
+      div.className = `msg ${type}`;
+      div.innerText = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function sendMessage(text) {
+      addMsg(text, "user");
+      input.value = "";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        addMsg(data.reply || data.error, "ai");
+      } catch {
+        addMsg("Connection error ⚠️", "ai");
+      }
+    }
+
+    sendBtn.onclick = () => {
+      const text = input.value.trim();
+      if (text) sendMessage(text);
+    };
+
+    // 🎤 VOICE
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.continuous = false;
+
+      micBtn.onclick = () => {
+        micBtn.classList.add("listening");
+        recognition.start();
+      };
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        micBtn.classList.remove("listening");
+        sendMessage(text);
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove("listening");
+        alert("Mic error ❌");
+      };
+    } else {
+      micBtn.disabled = true;
+      micBtn.innerText = "❌";
+    }
+  </script>
 </body>
 </html>
