@@ -3,112 +3,29 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MÎK AI v1.0</title>
-<style>
-body {
-  margin: 0;
-  background: #0b0b0b;
-  color: #fff;
-  font-family: system-ui;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-header {
-  padding: 16px;
-  text-align: center;
-  border-bottom: 1px solid #222;
-  font-weight: bold;
-  color: #10a37f;
-}
-#chat {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.msg {
-  padding: 12px 16px;
-  border-radius: 12px;
-  max-width: 80%;
-}
-.user {
-  align-self: flex-end;
-  background: #2a2a2a;
-}
-.ai {
-  align-self: flex-start;
-  background: #10a37f;
-  color: #fff;
-}
-#input {
-  display: flex;
-  padding: 16px;
-  border-top: 1px solid #222;
-  gap: 10px;
-}
-input {
-  flex: 1;
-  padding: 12px;
-  background: #1f1f1f;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 6px;
-}
-button {
-  padding: 12px 18px;
-  background: #10a37f;
-  border: none;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-</style>
+<title>MÎK AI</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>MÎK AI — Version 1.0</header>
+<header>
+  <div class="logo">MÎK AI</div>
+</header>
 
-<div id="chat"></div>
+<main id="chat-container">
+  <div id="welcome">
+    <h1>Hello 👋🏻</h1>
+    <p>How can I help you today?</p>
+  </div>
 
-<div id="input">
-  <input id="msg" placeholder="Ask MÎK AI..." />
-  <button onclick="send()">Send</button>
-</div>
+  <div id="chat"></div>
+</main>
 
-<script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("msg");
+<footer>
+  <input id="input" placeholder="Message MÎK AI…" />
+  <button onclick="send()">➤</button>
+</footer>
 
-function add(text, cls) {
-  const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-async function send() {
-  const text = input.value.trim();
-  if (!text) return;
-  add(text, "user");
-  input.value = "";
-
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-    const data = await res.json();
-    add(data.reply || data.error, "ai");
-  } catch {
-    add("Connection error.", "ai");
-  }
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
