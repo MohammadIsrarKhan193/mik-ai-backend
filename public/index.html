@@ -1,45 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MÎK AI</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MÎK AI v11.1</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- HEADER -->
+  <header>
+    <button id="menuBtn">☰</button>
+    <h1>MÎK AI</h1>
+    <div>
+      <button id="profileBtn">👤</button>
+      <button id="voiceBtn">🎙️</button>
+    </div>
+  </header>
 
-<header>
-  <button class="icon">☰</button>
-  <h1>MÎK AI</h1>
-  <div class="right-icons">
-    <button class="icon">👤</button>
-    <button class="icon">⭕</button>
+  <!-- HOME / QUICK ACTIONS -->
+  <section id="home">
+    <h2>What can I help with?</h2>
+
+    <div class="actions">
+      <button class="action-btn" onclick="quick('Create a futuristic AI logo')">
+        🎨<span>Create image</span>
+      </button>
+      <button class="action-btn" onclick="quick('Surprise me')">
+        🎁<span>Surprise me</span>
+      </button>
+      <button class="action-btn" onclick="quick('Summarize this text:')">
+        📄<span>Summarize text</span>
+      </button>
+      <button class="action-btn" onclick="quick('Write code for')">
+        💻<span>Code</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- CHAT AREA -->
+  <div id="chat"></div>
+
+  <!-- INPUT BAR -->
+  <div id="input-area">
+    <button id="plusBtn">+</button>
+    <input type="text" id="msgInput" placeholder="Ask MÎK AI...">
+    <button id="sendBtn" onclick="send()">➤</button>
   </div>
-</header>
 
-<!-- HOME SCREEN -->
-<section id="home">
-  <h2>What can I help with?</h2>
-
-  <div class="actions">
-    <button onclick="quick('Create a futuristic AI logo')">🎨 Create image</button>
-    <button onclick="quick('Surprise me')">🎁 Surprise me</button>
-    <button onclick="quick('Summarize this text:')">📄 Summarize text</button>
-    <button onclick="quick('Write code for')">💻 Code</button>
-  </div>
-</section>
-
-<!-- CHAT -->
-<main id="chat" class="hidden"></main>
-
-<!-- INPUT -->
-<footer>
-  <button class="icon">＋</button>
-  <input id="msgInput" placeholder="Ask MÎK AI…" />
-  <button id="voiceBtn">🎤</button>
-  <button onclick="send()">➤</button>
-</footer>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
+  <script>
+    /* QUICK ACTION FUNCTION */
+    function quick(text) {
+      const input = document.getElementById("msgInput");
+      input.value = text;
+      send();
+    }
+  </script>
 </body>
 </html>
