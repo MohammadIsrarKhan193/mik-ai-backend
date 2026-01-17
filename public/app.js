@@ -5,37 +5,44 @@ const voiceBtn = document.getElementById("voiceBtn");
 let voiceEnabled = true;
 const synth = window.speechSynthesis;
 
-// 🎤 Toggle Voice
+/* 🎤 Toggle Voice */
 voiceBtn.onclick = () => {
   voiceEnabled = !voiceEnabled;
-  voiceBtn.textContent = voiceEnabled ? "🔊" : "🔇";
+  voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
 };
 
+/* 🔊 Speak AI Response */
 function speak(text) {
-  if (!voiceEnabled) return;
-  if (!synth) return;
+  if (!voiceEnabled || !synth) return;
 
-  const utter = new SpeechSynthesisUtterance(text);
+  const utter = new SpeechSynthesisUtterance(String(text));
   utter.rate = 1;
   utter.pitch = 1;
   utter.lang = "en-US";
-  synth.cancel(); // stop previous
+
+  synth.cancel(); // stop previous voice
   synth.speak(utter);
 }
 
+/* 💬 Add Message Bubble */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
-  div.innerText = text;
+  div.innerText = String(text);
+
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 
   if (type === "ai") speak(text);
 }
 
+/* 🚀 Send Message */
 async function send() {
   const text = input.value.trim();
   if (!text) return;
+
+  // remove welcome screen (ChatGPT behavior)
+  document.getElementById("welcome")?.remove();
 
   addMsg(text, "user");
   input.value = "";
@@ -48,9 +55,9 @@ async function send() {
     });
 
     const data = await res.json();
-    addMsg(data.reply, "ai");
+    addMsg(data.reply || "No response 😢", "ai");
 
-  } catch {
+  } catch (err) {
     addMsg("Connection error 😢", "ai");
   }
 }
