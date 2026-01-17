@@ -2,48 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MÎK AI</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Favicon (optional) -->
-  <link rel="icon" href="favicon.ico" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
-
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <span>MÎK AI</span>
-    <button id="voiceBtn" title="Voice">🎤</button>
-  </header>
-
-  <!-- CHAT AREA -->
-  <div id="chat">
-
-    <!-- WELCOME SCREEN -->
-    <div id="welcome">
-      <h1>Hello 👋🏻</h1>
-      <p>How can I help you today?</p>
-    </div>
-
+<header>
+  <button class="icon">☰</button>
+  <h1>MÎK AI</h1>
+  <div class="right-icons">
+    <button class="icon">👤</button>
+    <button class="icon">⭕</button>
   </div>
+</header>
 
-  <!-- INPUT AREA -->
-  <div id="input-area">
-    <input
-      id="msgInput"
-      type="text"
-      placeholder="Message MÎK AI..."
-      autocomplete="off"
-    />
-    <button onclick="send()">➤</button>
+<!-- HOME SCREEN -->
+<section id="home">
+  <h2>What can I help with?</h2>
+
+  <div class="actions">
+    <button onclick="quick('Create a futuristic AI logo')">🎨 Create image</button>
+    <button onclick="quick('Surprise me')">🎁 Surprise me</button>
+    <button onclick="quick('Summarize this text:')">📄 Summarize text</button>
+    <button onclick="quick('Write code for')">💻 Code</button>
   </div>
+</section>
 
-  <!-- JS -->
-  <script src="app.js"></script>
+<!-- CHAT -->
+<main id="chat" class="hidden"></main>
 
+<!-- INPUT -->
+<footer>
+  <button class="icon">＋</button>
+  <input id="msgInput" placeholder="Ask MÎK AI…" />
+  <button id="voiceBtn">🎤</button>
+  <button onclick="send()">➤</button>
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>
