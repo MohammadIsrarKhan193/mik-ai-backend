@@ -107,3 +107,17 @@ button {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* 🖼️ IMAGE CARD (V9.0) */
+.img-card {
+  margin-top: 10px;
+}
+
+.img-card img {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 16px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
