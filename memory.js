@@ -1,41 +1,40 @@
 const fs = require("fs");
 const path = require("path");
 
-const MEMORY_FILE = path.join(__dirname, "memory.json");
+// We use /tmp because Render allows writing files there more easily
+const MEMORY_FILE = "/tmp/memory.json";
 
-// Load memory from file
 function loadMemory() {
-  if (!fs.existsSync(MEMORY_FILE)) {
-    return [];
-  }
   try {
+    if (!fs.existsSync(MEMORY_FILE)) {
+      // Create an empty file if it doesn't exist
+      fs.writeFileSync(MEMORY_FILE, JSON.stringify([]));
+      return [];
+    }
     return JSON.parse(fs.readFileSync(MEMORY_FILE, "utf8"));
-  } catch {
+  } catch (err) {
+    console.error("Memory load error:", err);
     return [];
   }
 }
 
-// Save memory to file
 function saveMemory(memory) {
-  fs.writeFileSync(MEMORY_FILE, JSON.stringify(memory, null, 2));
+  try {
+    fs.writeFileSync(MEMORY_FILE, JSON.stringify(memory, null, 2));
+  } catch (err) {
+    console.error("Memory save error:", err);
+  }
 }
 
-// Add new memory entry
 function addMemory(role, content) {
   const memory = loadMemory();
   memory.push({ role, content });
-
-  // Keep last 20 messages only (safe & fast)
   const trimmed = memory.slice(-20);
   saveMemory(trimmed);
 }
 
-// Get memory for AI
 function getMemory() {
   return loadMemory();
 }
 
-module.exports = {
-  addMemory,
-  getMemory
-};
+module.exports = { addMemory, getMemory };
