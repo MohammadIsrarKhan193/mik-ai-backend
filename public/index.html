@@ -1,21 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MÎK AI</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon (optional) -->
+  <link rel="icon" href="favicon.ico" />
+</head>
+
 <body>
 
-<header>
-  <span>MÎK AI</span>
-  <button id="voiceBtn">🔊</button>
-</header>
+  <!-- HEADER -->
+  <header>
+    <span>MÎK AI</span>
+    <button id="voiceBtn" title="Voice">🎤</button>
+  </header>
 
-<div id="chat">
-  <div id="welcome">
-    <h1>Hello 👋🏻</h1>
-    <p>How can I help you today?</p>
+  <!-- CHAT AREA -->
+  <div id="chat">
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome">
+      <h1>Hello 👋🏻</h1>
+      <p>How can I help you today?</p>
+    </div>
+
   </div>
-</div>
 
-<div id="input-area">
-  <input id="msgInput" placeholder="Message MÎK AI..." />
-  <button onclick="send()">➤</button>
-</div>
+  <!-- INPUT AREA -->
+  <div id="input-area">
+    <input
+      id="msgInput"
+      type="text"
+      placeholder="Message MÎK AI..."
+      autocomplete="off"
+    />
+    <button onclick="send()">➤</button>
+  </div>
 
-<script src="app.js"></script>
+  <!-- JS -->
+  <script src="app.js"></script>
+
 </body>
+</html>
