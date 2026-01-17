@@ -1,34 +1,41 @@
 const fs = require("fs");
 const path = require("path");
 
-const memoryFile = path.join(__dirname, "memory.json");
+const MEMORY_FILE = path.join(__dirname, "memory.json");
 
-// Load memory
+// Load memory from file
 function loadMemory() {
-  if (!fs.existsSync(memoryFile)) {
-    fs.writeFileSync(memoryFile, JSON.stringify({}), "utf8");
+  if (!fs.existsSync(MEMORY_FILE)) {
+    return [];
   }
-  return JSON.parse(fs.readFileSync(memoryFile, "utf8"));
+  try {
+    return JSON.parse(fs.readFileSync(MEMORY_FILE, "utf8"));
+  } catch {
+    return [];
+  }
 }
 
-// Save memory
+// Save memory to file
 function saveMemory(memory) {
-  fs.writeFileSync(memoryFile, JSON.stringify(memory, null, 2), "utf8");
+  fs.writeFileSync(MEMORY_FILE, JSON.stringify(memory, null, 2));
 }
 
-// Get memory for user
-function getMemory(userId = "default") {
+// Add new memory entry
+function addMemory(role, content) {
   const memory = loadMemory();
-  return memory[userId] || [];
+  memory.push({ role, content });
+
+  // Keep last 20 messages only (safe & fast)
+  const trimmed = memory.slice(-20);
+  saveMemory(trimmed);
 }
 
-// Add memory
-function addMemory(text, userId = "default") {
-  const memory = loadMemory();
-  if (!memory[userId]) memory[userId] = [];
-
-  memory[userId].push(text);
-  saveMemory(memory);
+// Get memory for AI
+function getMemory() {
+  return loadMemory();
 }
 
-module.exports = { getMemory, addMemory };
+module.exports = {
+  addMemory,
+  getMemory
+};
