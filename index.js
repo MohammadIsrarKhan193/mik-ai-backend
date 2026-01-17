@@ -1,88 +1,86 @@
 const express = require("express");
-const fs = require("fs");
+const Groq = require("groq-sdk");
+const cors = require("cors");
+require("dotenv").config();
+
+const { addMemory, getMemory } = require("./memory");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// =======================
-// MIDDLEWARE
-// =======================
+app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-// =======================
-// MEMORY
-// =======================
-const MEMORY_FILE = "memory.json";
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
-if (!fs.existsSync(MEMORY_FILE)) {
-  fs.writeFileSync(MEMORY_FILE, JSON.stringify({}));
-}
+// Health check
+app.get("/", (req, res) => {
+  res.send("MÎK AI v10.0 — Persistent Memory Active 🧠");
+});
 
-function loadMemory() {
-  return JSON.parse(fs.readFileSync(MEMORY_FILE, "utf8"));
-}
-
-function saveMemory(data) {
-  fs.writeFileSync(MEMORY_FILE, JSON.stringify(data, null, 2));
-}
-
-// =======================
-// CHAT ROUTE
-// =======================
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
-    const userId = "mik";
-
-    const memoryData = loadMemory();
-    const memory = memoryData[userId]?.join("\n") || "";
-
-    // save name automatically
-    if (
-      message.toLowerCase().includes("my name is") ||
-      message.toLowerCase().includes("i am") ||
-      message.toLowerCase().includes("i'm")
-    ) {
-      if (!memoryData[userId]) memoryData[userId] = [];
-      memoryData[userId].push(message);
-      saveMemory(memoryData);
+    if (!message) {
+      return res.status(400).json({ reply: "Empty message received." });
     }
 
-    const prompt = `
-You are MÎK AI 🎤, created by Mohammad Israr "MÎK".
-You remember user details across messages.
+    // Load memory
+    const memory = getMemory();
 
-Memory:
-${memory || "No memory yet"}
+    // Store user message
+    addMemory("user", message);
 
-User: ${message}
-MÎK AI:
-`;
+    // IMAGE GENERATION (Pollinations)
+    const lower = message.toLowerCase();
+    if (
+      lower.includes("create") ||
+      lower.includes("generate") ||
+      lower.includes("logo") ||
+      lower.includes("image") ||
+      lower.includes("dp")
+    ) {
+      const seed = Math.floor(Math.random() * 100000);
+      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(
+        message
+      )}?width=1024&height=1024&seed=${seed}&model=flux`;
 
-    const aiRes = await fetch("https://api.pollinations.ai/prompt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "openai",
-        prompt,
-        max_tokens: 200
-      })
+      const reply = `🎨 **Here’s your image:**\n${imageUrl}`;
+      addMemory("assistant", reply);
+      return res.json({ reply });
+    }
+
+    // Chat completion with memory
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are MÎK AI v10.0, a professional AI assistant created by Mohammad Israr (MÎK). You remember past conversations and respond intelligently."
+        },
+        ...memory,
+        { role: "user", content: message }
+      ]
     });
 
-    const reply = await aiRes.text();
+    const reply = completion.choices[0].message.content;
+
+    // Store AI reply
+    addMemory("assistant", reply);
 
     res.json({ reply });
 
-  } catch (err) {
-    console.error(err);
-    res.json({ reply: "Server error 😢" });
+  } catch (error) {
+    console.error("MÎK AI Error:", error);
+    res.status(500).json({
+      reply: "⚠️ MÎK AI is tired. Please try again."
+    });
   }
 });
 
-// =======================
-// START SERVER
-// =======================
-app.listen(PORT, () => {
-  console.log("✅ MÎK AI Server Running");
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`🚀 MÎK AI v10.0 running on port ${PORT}`)
+);
