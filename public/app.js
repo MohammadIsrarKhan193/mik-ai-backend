@@ -1,48 +1,36 @@
 const chat = document.getElementById("chat");
+const home = document.getElementById("home");
 const input = document.getElementById("msgInput");
 const voiceBtn = document.getElementById("voiceBtn");
 
 let voiceEnabled = true;
 const synth = window.speechSynthesis;
 
-/* 🎤 Toggle Voice */
 voiceBtn.onclick = () => {
   voiceEnabled = !voiceEnabled;
   voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
 };
 
-/* 🔊 Speak AI Response */
 function speak(text) {
-  if (!voiceEnabled || !synth) return;
-
-  const utter = new SpeechSynthesisUtterance(String(text));
-  utter.rate = 1;
-  utter.pitch = 1;
-  utter.lang = "en-US";
-
-  synth.cancel(); // stop previous voice
-  synth.speak(utter);
+  if (!voiceEnabled) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  synth.cancel();
+  synth.speak(u);
 }
 
-/* 💬 Add Message Bubble */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
 
-  // Detect image URLs (Pollinations)
-  const imgMatch = text.match(/https:\/\/pollinations\.ai\/p\/[^\s]+/);
-
-  if (imgMatch) {
-    const imgDiv = document.createElement("div");
-    imgDiv.className = "img-card";
-
-    const img = document.createElement("img");
-    img.src = imgMatch[0];
-    img.loading = "lazy";
-
-    imgDiv.appendChild(img);
-    div.innerHTML = text.replace(imgMatch[0], "");
-    div.appendChild(imgDiv);
+  const img = text.match(/https:\/\/pollinations\.ai\/p\/[^\s]+/);
+  if (img) {
+    div.innerHTML = text.replace(img[0], "");
+    const image = document.createElement("img");
+    image.src = img[0];
+    image.style.width = "100%";
+    image.style.borderRadius = "16px";
+    div.appendChild(image);
   } else {
     div.innerText = text;
   }
@@ -52,13 +40,13 @@ function addMsg(text, type) {
 
   if (type === "ai") speak(text);
 }
-/* 🚀 Send Message */
+
 async function send() {
   const text = input.value.trim();
   if (!text) return;
 
-  // remove welcome screen (ChatGPT behavior)
-  document.getElementById("welcome")?.remove();
+  home.classList.add("hidden");
+  chat.classList.remove("hidden");
 
   addMsg(text, "user");
   input.value = "";
@@ -71,9 +59,13 @@ async function send() {
     });
 
     const data = await res.json();
-    addMsg(data.reply || "No response 😢", "ai");
-
-  } catch (err) {
+    addMsg(data.reply, "ai");
+  } catch {
     addMsg("Connection error 😢", "ai");
   }
+}
+
+function quick(text) {
+  input.value = text;
+  send();
 }
