@@ -1,70 +1,109 @@
 body {
-  background: #0b0b0b;
-  color: white;
-  font-family: system-ui;
+  background: #0e0e0e;
+  color: #e5e5e5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
   margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* HEADER */
 header {
-  padding: 14px;
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #10a37f;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #1f1f1f;
 }
 
-#voiceBtn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #10a37f;
-}
-
+/* CHAT AREA */
 #chat {
   flex: 1;
-  padding: 15px;
+  padding: 20px;
   overflow-y: auto;
 }
 
-.msg {
-  max-width: 80%;
-  padding: 12px;
-  border-radius: 12px;
+/* WELCOME SCREEN */
+#welcome {
+  margin-top: 20vh;
+  text-align: center;
+}
+
+#welcome h1 {
+  font-size: 36px;
+  font-weight: 600;
   margin-bottom: 10px;
+}
+
+#welcome p {
+  font-size: 18px;
+  color: #aaa;
+}
+
+/* CHAT BUBBLES */
+.msg {
+  max-width: 75%;
+  padding: 14px 18px;
+  border-radius: 22px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  animation: fade 0.3s ease;
 }
 
 .user {
   background: #2b2b2b;
   margin-left: auto;
+  border-bottom-right-radius: 6px;
 }
 
 .ai {
   background: #10a37f;
+  color: white;
+  border-bottom-left-radius: 6px;
 }
 
+/* INPUT BAR */
 #input-area {
   display: flex;
-  padding: 10px;
-  gap: 8px;
-  border-top: 1px solid #222;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid #1f1f1f;
 }
 
 input {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   background: #1f1f1f;
   border: none;
+  border-radius: 24px;
   color: white;
+  outline: none;
 }
 
 button {
   background: #10a37f;
   border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
   color: white;
-  padding: 0 16px;
+  cursor: pointer;
+}
+
+/* VOICE BUTTON */
+#voiceBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #10a37f;
+  cursor: pointer;
+}
+
+/* ANIMATION */
+@keyframes fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
