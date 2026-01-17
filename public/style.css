@@ -1,12 +1,9 @@
-* {
-  box-sizing: border-box;
-}
-
+/* BODY */
 body {
-  margin: 0;
-  background: #0b0b0b;
-  color: #fff;
+  background: #0e0e0e;
+  color: #e5e5e5;
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -14,71 +11,71 @@ body {
 
 /* HEADER */
 header {
+  padding: 14px 18px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 14px;
+  align-items: center;
+  color: #10a37f;
   border-bottom: 1px solid #1f1f1f;
 }
 
-header h1 {
-  color: #10a37f;
-  font-size: 18px;
-}
-
-.icon {
-  background: #1f1f1f;
-  border: none;
-  color: white;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  font-size: 16px;
-}
-
-/* HOME */
-#home {
-  flex: 1;
-  padding: 30px 20px;
-  text-align: center;
-}
-
-#home h2 {
-  font-size: 26px;
-  margin-bottom: 25px;
-}
-
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.actions button {
-  padding: 14px;
-  border-radius: 16px;
-  border: none;
-  background: #1f1f1f;
-  color: white;
-  font-size: 14px;
-}
-
-/* CHAT */
+/* CHAT AREA */
 #chat {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
 }
 
-.hidden {
-  display: none;
+/* HOME / QUICK ACTIONS */
+#home {
+  padding: 20px;
 }
 
+#home h2 {
+  margin-bottom: 14px;
+}
+
+/* ACTION BUTTONS GRID */
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  justify-items: center;
+  align-items: center;
+}
+
+/* INDIVIDUAL BUTTON */
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 50%;
+  background: #10a37f;
+  color: #fff;
+  font-size: 14px;
+  min-width: 70px;
+  min-height: 70px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.action-btn span {
+  font-size: 12px;
+  display: block;
+  line-height: 1.2;
+}
+
+/* CHAT BUBBLES */
 .msg {
   max-width: 75%;
   padding: 14px 18px;
-  border-radius: 20px;
+  border-radius: 22px;
   margin-bottom: 12px;
+  line-height: 1.5;
   animation: fade 0.3s ease;
 }
 
@@ -90,30 +87,64 @@ header h1 {
 
 .ai {
   background: #10a37f;
-  color: #fff;
+  color: white;
   border-bottom-left-radius: 6px;
 }
 
-/* INPUT */
-footer {
+/* INPUT BAR */
+#input-area {
   display: flex;
   gap: 10px;
   padding: 12px;
   border-top: 1px solid #1f1f1f;
 }
 
-footer input {
+input {
   flex: 1;
   padding: 14px;
-  border-radius: 24px;
-  border: none;
   background: #1f1f1f;
+  border: none;
+  border-radius: 24px;
   color: white;
   outline: none;
+}
+
+button {
+  background: #10a37f;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+}
+
+/* VOICE BUTTON */
+#voiceBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #10a37f;
+  cursor: pointer;
 }
 
 /* ANIMATION */
 @keyframes fade {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* IMAGE CARD */
+.img-card {
+  margin-top: 10px;
+}
+
+.img-card img {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 16px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  cursor: pointer;
 }
