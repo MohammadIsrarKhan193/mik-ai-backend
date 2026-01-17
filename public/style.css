@@ -9,10 +9,20 @@ body {
 }
 
 header {
-  text-align: center;
   padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #10a37f;
   border-bottom: 1px solid #222;
+}
+
+#voiceBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #10a37f;
 }
 
 #chat {
@@ -28,8 +38,14 @@ header {
   margin-bottom: 10px;
 }
 
-.user { background: #2b2b2b; margin-left: auto; }
-.ai { background: #10a37f; }
+.user {
+  background: #2b2b2b;
+  margin-left: auto;
+}
+
+.ai {
+  background: #10a37f;
+}
 
 #input-area {
   display: flex;
