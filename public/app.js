@@ -28,14 +28,30 @@ function speak(text) {
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
-  div.innerText = String(text);
+
+  // Detect image URLs (Pollinations)
+  const imgMatch = text.match(/https:\/\/pollinations\.ai\/p\/[^\s]+/);
+
+  if (imgMatch) {
+    const imgDiv = document.createElement("div");
+    imgDiv.className = "img-card";
+
+    const img = document.createElement("img");
+    img.src = imgMatch[0];
+    img.loading = "lazy";
+
+    imgDiv.appendChild(img);
+    div.innerHTML = text.replace(imgMatch[0], "");
+    div.appendChild(imgDiv);
+  } else {
+    div.innerText = text;
+  }
 
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 
   if (type === "ai") speak(text);
 }
-
 /* 🚀 Send Message */
 async function send() {
   const text = input.value.trim();
