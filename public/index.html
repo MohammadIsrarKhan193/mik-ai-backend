@@ -8,31 +8,55 @@
 </head>
 <body>
 
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <h3>MÎK AI</h3>
+  <button onclick="newChat()">➕ New chat</button>
+  <button onclick="alert('History coming soon')">🕘 History</button>
+  <button onclick="alert('Settings coming soon')">⚙ Settings</button>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay" onclick="closeAll()"></div>
+
 <header>
-  <button id="menuBtn" class="icon">☰</button>
+  <button id="menuBtn">☰</button>
   <h1>MÎK AI</h1>
   <div class="right">
-    <button id="profileBtn" class="icon">👤</button>
-    <button id="voiceBtn" class="icon">🎤</button>
+    <button id="profileBtn">👤</button>
+    <button id="voiceBtn">🎙️</button>
   </div>
 </header>
 
-<!-- HOME SCREEN -->
+<!-- HOME -->
 <div id="home">
   <h2>What can I help with?</h2>
-
   <div class="actions">
     <button onclick="quickPrompt('Create an image')">🎨 Create image</button>
     <button onclick="quickPrompt('Surprise me')">🎁 Surprise me</button>
-    <button onclick="quickPrompt('Summarize this text')">📄 Summarize text</button>
-    <button onclick="quickPrompt('Write some code')">💻 Code</button>
+    <button onclick="quickPrompt('Summarize this text')">📄 Summarize</button>
+    <button onclick="quickPrompt('Write code')">💻 Code</button>
   </div>
 </div>
 
 <!-- CHAT -->
 <div id="chat"></div>
 
-<!-- INPUT BAR -->
+<!-- UPLOAD PANEL -->
+<div id="tools">
+  <button onclick="alert('Upload file soon')">📎 Upload file</button>
+  <button onclick="alert('Camera soon')">📷 Camera</button>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profile">
+  <h3>👤 Profile</h3>
+  <p><b>Name:</b> Mohammad Israr (MÎK)</p>
+  <p><b>AI:</b> MÎK AI v12.0</p>
+  <button onclick="closeAll()">Close</button>
+</div>
+
+<!-- INPUT -->
 <div id="input-area">
   <button id="plusBtn">＋</button>
   <input id="msgInput" placeholder="Ask MÎK AI..." />
