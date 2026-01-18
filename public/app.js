@@ -2,29 +2,32 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const home = document.getElementById("home");
 
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const tools = document.getElementById("tools");
+const profile = document.getElementById("profile");
+
 const menuBtn = document.getElementById("menuBtn");
 const plusBtn = document.getElementById("plusBtn");
 const profileBtn = document.getElementById("profileBtn");
 const voiceBtn = document.getElementById("voiceBtn");
 
 let voiceEnabled = true;
-const synth = window.speechSynthesis;
 
-/* 🎤 VOICE */
+/* VOICE */
 voiceBtn.onclick = () => {
   voiceEnabled = !voiceEnabled;
-  voiceBtn.classList.toggle("off");
+  voiceBtn.style.opacity = voiceEnabled ? 1 : 0.5;
 };
 
 function speak(text) {
   if (!voiceEnabled) return;
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US";
-  synth.cancel();
-  synth.speak(u);
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
 }
 
-/* 💬 MESSAGE */
+/* MESSAGE */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
@@ -34,7 +37,7 @@ function addMsg(text, type) {
   if (type === "ai") speak(text);
 }
 
-/* 🚀 SEND */
+/* SEND */
 async function send() {
   const text = input.value.trim();
   if (!text) return;
@@ -50,29 +53,44 @@ async function send() {
       body: JSON.stringify({ message: text })
     });
     const data = await res.json();
-    addMsg(data.reply || "No response 😢", "ai");
+    addMsg(data.reply || "No response", "ai");
   } catch {
     addMsg("Connection error 😢", "ai");
   }
 }
 
-/* ⚡ QUICK PROMPTS */
+/* QUICK */
 function quickPrompt(text) {
   input.value = text;
   send();
 }
 
-/* ☰ SIDEBAR */
+/* SIDEBAR */
 menuBtn.onclick = () => {
-  alert("Sidebar coming in next version 🚧");
+  sidebar.classList.add("open");
+  overlay.style.display = "block";
 };
 
-/* ➕ PLUS */
+/* PLUS */
 plusBtn.onclick = () => {
-  alert("Upload & tools coming soon 🚀");
+  tools.style.display = tools.style.display === "block" ? "none" : "block";
 };
 
-/* 👤 PROFILE */
+/* PROFILE */
 profileBtn.onclick = () => {
-  addMsg("👤 Profile feature coming soon", "ai");
+  profile.style.display = "block";
+  overlay.style.display = "block";
 };
+
+function closeAll() {
+  sidebar.classList.remove("open");
+  tools.style.display = "none";
+  profile.style.display = "none";
+  overlay.style.display = "none";
+}
+
+function newChat() {
+  chat.innerHTML = "";
+  home.style.display = "block";
+  closeAll();
+}
