@@ -1,14 +1,19 @@
 const chat = document.getElementById("chat");
-const home = document.getElementById("home");
 const input = document.getElementById("msgInput");
+const home = document.getElementById("home");
+
+const menuBtn = document.getElementById("menuBtn");
+const plusBtn = document.getElementById("plusBtn");
+const profileBtn = document.getElementById("profileBtn");
 const voiceBtn = document.getElementById("voiceBtn");
 
 let voiceEnabled = true;
 const synth = window.speechSynthesis;
 
+/* 🎤 VOICE */
 voiceBtn.onclick = () => {
   voiceEnabled = !voiceEnabled;
-  voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
+  voiceBtn.classList.toggle("off");
 };
 
 function speak(text) {
@@ -19,35 +24,22 @@ function speak(text) {
   synth.speak(u);
 }
 
+/* 💬 MESSAGE */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
-
-  const img = text.match(/https:\/\/pollinations\.ai\/p\/[^\s]+/);
-  if (img) {
-    div.innerHTML = text.replace(img[0], "");
-    const image = document.createElement("img");
-    image.src = img[0];
-    image.style.width = "100%";
-    image.style.borderRadius = "16px";
-    div.appendChild(image);
-  } else {
-    div.innerText = text;
-  }
-
+  div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-
   if (type === "ai") speak(text);
 }
 
+/* 🚀 SEND */
 async function send() {
   const text = input.value.trim();
   if (!text) return;
 
-  home.classList.add("hidden");
-  chat.classList.remove("hidden");
-
+  home.style.display = "none";
   addMsg(text, "user");
   input.value = "";
 
@@ -57,15 +49,30 @@ async function send() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text })
     });
-
     const data = await res.json();
-    addMsg(data.reply, "ai");
+    addMsg(data.reply || "No response 😢", "ai");
   } catch {
     addMsg("Connection error 😢", "ai");
   }
 }
 
-function quick(text) {
+/* ⚡ QUICK PROMPTS */
+function quickPrompt(text) {
   input.value = text;
   send();
 }
+
+/* ☰ SIDEBAR */
+menuBtn.onclick = () => {
+  alert("Sidebar coming in next version 🚧");
+};
+
+/* ➕ PLUS */
+plusBtn.onclick = () => {
+  alert("Upload & tools coming soon 🚀");
+};
+
+/* 👤 PROFILE */
+profileBtn.onclick = () => {
+  addMsg("👤 Profile feature coming soon", "ai");
+};
