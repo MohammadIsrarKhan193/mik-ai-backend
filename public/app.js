@@ -1,54 +1,50 @@
 const chatArea = document.getElementById("chatArea");
-const userInput = document.getElementById("userInput");
+const input = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
-const typingIndicator = document.getElementById("typingIndicator");
+const typing = document.getElementById("typing");
+const welcome = document.getElementById("welcome");
+const sidebar = document.getElementById("sidebar");
+const profileModal = document.getElementById("profileModal");
 
-// Buttons (future-ready)
 document.getElementById("menuBtn").onclick = () =>
-  alert("Sidebar coming in next version 🚧");
-
-document.getElementById("plusBtn").onclick = () =>
-  alert("Upload & tools coming soon 🚀");
+  sidebar.classList.toggle("open");
 
 document.getElementById("profileBtn").onclick = () =>
-  alert("Profile feature coming soon 👤");
+  profileModal.style.display = "flex";
 
-document.getElementById("voiceBtn").onclick = () =>
-  alert("Voice mode polishing in progress 🎙️");
+function closeProfile() {
+  profileModal.style.display = "none";
+}
 
-sendBtn.onclick = sendMessage;
-userInput.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
+sendBtn.onclick = send;
+input.addEventListener("keypress", e => {
+  if (e.key === "Enter") send();
 });
 
-function sendMessage() {
-  const text = userInput.value.trim();
+function send() {
+  const text = input.value.trim();
   if (!text) return;
 
-  addMessage(text, "user");
-  userInput.value = "";
+  welcome.style.display = "none";
 
-  typingIndicator.style.display = "block";
+  addMsg(text, "user");
+  input.value = "";
+
+  typing.style.display = "block";
 
   setTimeout(() => {
-    typingIndicator.style.display = "none";
-    aiReply(text);
+    typing.style.display = "none";
+    addMsg(
+      "I'm MÎK AI v12.0 💚 A step closer to a real assistant. Big upgrades ahead 🚀",
+      "ai"
+    );
   }, 1200);
 }
 
-function addMessage(text, sender) {
+function addMsg(text, type) {
   const div = document.createElement("div");
-  div.className = `message ${sender}`;
+  div.className = `msg ${type}`;
   div.textContent = text;
   chatArea.appendChild(div);
   chatArea.scrollTop = chatArea.scrollHeight;
-}
-
-function aiReply(userText) {
-  const reply =
-    "Thanks for your message 💚 I'm MÎK AI v11.0. " +
-    "This version focuses on stability, polish, and clean experience. " +
-    "Big features are coming next 🚀";
-
-  addMessage(reply, "ai");
 }
