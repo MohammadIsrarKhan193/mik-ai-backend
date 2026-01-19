@@ -1,96 +1,54 @@
-const chat = document.getElementById("chat");
-const input = document.getElementById("msgInput");
-const home = document.getElementById("home");
+const chatArea = document.getElementById("chatArea");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const typingIndicator = document.getElementById("typingIndicator");
 
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const tools = document.getElementById("tools");
-const profile = document.getElementById("profile");
+// Buttons (future-ready)
+document.getElementById("menuBtn").onclick = () =>
+  alert("Sidebar coming in next version 🚧");
 
-const menuBtn = document.getElementById("menuBtn");
-const plusBtn = document.getElementById("plusBtn");
-const profileBtn = document.getElementById("profileBtn");
-const voiceBtn = document.getElementById("voiceBtn");
+document.getElementById("plusBtn").onclick = () =>
+  alert("Upload & tools coming soon 🚀");
 
-let voiceEnabled = true;
+document.getElementById("profileBtn").onclick = () =>
+  alert("Profile feature coming soon 👤");
 
-/* VOICE */
-voiceBtn.onclick = () => {
-  voiceEnabled = !voiceEnabled;
-  voiceBtn.style.opacity = voiceEnabled ? 1 : 0.5;
-};
+document.getElementById("voiceBtn").onclick = () =>
+  alert("Voice mode polishing in progress 🎙️");
 
-function speak(text) {
-  if (!voiceEnabled) return;
-  const u = new SpeechSynthesisUtterance(text);
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
+sendBtn.onclick = sendMessage;
+userInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
 
-/* MESSAGE */
-function addMsg(text, type) {
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-  if (type === "ai") speak(text);
-}
-
-/* SEND */
-async function send() {
-  const text = input.value.trim();
+function sendMessage() {
+  const text = userInput.value.trim();
   if (!text) return;
 
-  home.style.display = "none";
-  addMsg(text, "user");
-  input.value = "";
+  addMessage(text, "user");
+  userInput.value = "";
 
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-    const data = await res.json();
-    addMsg(data.reply || "No response", "ai");
-  } catch {
-    addMsg("Connection error 😢", "ai");
-  }
+  typingIndicator.style.display = "block";
+
+  setTimeout(() => {
+    typingIndicator.style.display = "none";
+    aiReply(text);
+  }, 1200);
 }
 
-/* QUICK */
-function quickPrompt(text) {
-  input.value = text;
-  send();
+function addMessage(text, sender) {
+  const div = document.createElement("div");
+  div.className = `message ${sender}`;
+  div.textContent = text;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-/* SIDEBAR */
-menuBtn.onclick = () => {
-  sidebar.classList.add("open");
-  overlay.style.display = "block";
-};
+function aiReply(userText) {
+  const reply =
+    "Thanks for your message 💚 I'm MÎK AI v11.0. " +
+    "This version focuses on stability, polish, and clean experience. " +
+    "Big features are coming next 🚀";
 
-/* PLUS */
-plusBtn.onclick = () => {
-  tools.style.display = tools.style.display === "block" ? "none" : "block";
-};
-
-/* PROFILE */
-profileBtn.onclick = () => {
-  profile.style.display = "block";
-  overlay.style.display = "block";
-};
-
-function closeAll() {
-  sidebar.classList.remove("open");
-  tools.style.display = "none";
-  profile.style.display = "none";
-  overlay.style.display = "none";
-}
-
-function newChat() {
-  chat.innerHTML = "";
-  home.style.display = "block";
-  closeAll();
+  addMessage(reply, "ai");
 }
