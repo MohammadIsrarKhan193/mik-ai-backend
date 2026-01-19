@@ -8,16 +8,16 @@
 body {
   background: #0e0e0e;
   color: #fff;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
 /* HEADER */
 .top-bar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 12px;
   background: #111;
   border-bottom: 1px solid #222;
@@ -25,14 +25,44 @@ body {
 
 .top-bar h1 {
   color: #4caf91;
-  font-size: 20px;
 }
 
-.top-bar button {
-  background: none;
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -240px;
+  width: 220px;
+  height: 100%;
+  background: #151515;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 10;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+/* WELCOME */
+#welcome {
+  text-align: center;
+  padding: 30px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.actions button {
+  background: #4caf91;
   border: none;
-  color: #4caf91;
-  font-size: 20px;
+  padding: 15px;
+  border-radius: 50%;
+  color: #fff;
 }
 
 /* CHAT */
@@ -42,32 +72,20 @@ body {
   overflow-y: auto;
 }
 
-.message {
+.msg {
   max-width: 80%;
-  padding: 12px 14px;
-  margin-bottom: 12px;
+  padding: 12px;
   border-radius: 14px;
-  line-height: 1.4;
-  animation: fadeIn 0.3s ease;
+  margin-bottom: 12px;
 }
 
-.message.ai {
-  background: #4caf91;
-  color: #fff;
-  align-self: flex-start;
-}
-
-.message.user {
+.msg.user {
   background: #2a2a2a;
-  align-self: flex-end;
+  margin-left: auto;
 }
 
-/* TYPING */
-#typingIndicator {
-  display: none;
-  padding: 8px 15px;
-  font-size: 14px;
-  color: #aaa;
+.msg.ai {
+  background: #4caf91;
 }
 
 /* INPUT */
@@ -81,25 +99,25 @@ body {
 
 .input-bar input {
   flex: 1;
-  padding: 10px;
-  border-radius: 20px;
-  border: none;
-  outline: none;
   background: #1e1e1e;
-  color: #fff;
-}
-
-.input-bar button {
-  background: #4caf91;
   border: none;
+  border-radius: 20px;
+  padding: 10px;
   color: #fff;
-  padding: 0 14px;
-  border-radius: 50%;
-  font-size: 18px;
 }
 
-/* ANIMATION */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
 }
