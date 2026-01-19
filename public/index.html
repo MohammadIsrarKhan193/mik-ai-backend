@@ -3,39 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MÎK AI v11.0</title>
+  <title>MÎK AI v12.0</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="top-bar">
-    <button id="menuBtn">☰</button>
-    <h1>MÎK AI</h1>
-    <div class="top-icons">
-      <button id="profileBtn">👤</button>
-      <button id="voiceBtn">🎤</button>
-    </div>
-  </header>
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+  <h2>MÎK AI</h2>
+  <p>Version 12.0</p>
+  <button onclick="alert('Chats coming soon')">💬 New Chat</button>
+  <button onclick="alert('Settings coming soon')">⚙️ Settings</button>
+</div>
 
-  <!-- CHAT AREA -->
-  <main id="chatArea">
-    <div class="message ai">
-      Hello 👋🏻 I'm <b>MÎK AI v11.0</b>.  
-      How can I help you today?
-    </div>
-  </main>
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <h3>Profile</h3>
+    <p><b>Name:</b> Mohammad Israr (MÎK)</p>
+    <button onclick="closeProfile()">Close</button>
+  </div>
+</div>
 
-  <!-- TYPING INDICATOR -->
-  <div id="typingIndicator">MÎK AI is thinking… ⏳</div>
+<!-- HEADER -->
+<header class="top-bar">
+  <button id="menuBtn">☰</button>
+  <h1>MÎK AI</h1>
+  <div>
+    <button id="profileBtn">👤</button>
+    <button id="voiceBtn">🎤</button>
+  </div>
+</header>
 
-  <!-- INPUT BAR -->
-  <footer class="input-bar">
-    <button id="plusBtn">＋</button>
-    <input id="userInput" type="text" placeholder="Ask MÎK AI…" />
-    <button id="sendBtn">➤</button>
-  </footer>
+<!-- WELCOME -->
+<section id="welcome">
+  <h2>What can I help with?</h2>
+  <div class="actions">
+    <button>🎨 Create image</button>
+    <button>🧾 Summarize text</button>
+    <button>💻 Code</button>
+    <button>🎁 Surprise me</button>
+  </div>
+</section>
 
-  <script src="app.js"></script>
+<!-- CHAT -->
+<main id="chatArea"></main>
+
+<div id="typing">MÎK AI is thinking…</div>
+
+<!-- INPUT -->
+<footer class="input-bar">
+  <button id="plusBtn">＋</button>
+  <input id="userInput" placeholder="Ask MÎK AI…" />
+  <button id="sendBtn">➤</button>
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>
