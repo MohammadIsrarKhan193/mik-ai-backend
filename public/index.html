@@ -3,66 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MÎK AI</title>
+  <title>MÎK AI v11.0</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <h3>MÎK AI</h3>
-  <button onclick="newChat()">➕ New chat</button>
-  <button onclick="alert('History coming soon')">🕘 History</button>
-  <button onclick="alert('Settings coming soon')">⚙ Settings</button>
-</div>
+  <!-- HEADER -->
+  <header class="top-bar">
+    <button id="menuBtn">☰</button>
+    <h1>MÎK AI</h1>
+    <div class="top-icons">
+      <button id="profileBtn">👤</button>
+      <button id="voiceBtn">🎤</button>
+    </div>
+  </header>
 
-<!-- OVERLAY -->
-<div id="overlay" onclick="closeAll()"></div>
+  <!-- CHAT AREA -->
+  <main id="chatArea">
+    <div class="message ai">
+      Hello 👋🏻 I'm <b>MÎK AI v11.0</b>.  
+      How can I help you today?
+    </div>
+  </main>
 
-<header>
-  <button id="menuBtn">☰</button>
-  <h1>MÎK AI</h1>
-  <div class="right">
-    <button id="profileBtn">👤</button>
-    <button id="voiceBtn">🎙️</button>
-  </div>
-</header>
+  <!-- TYPING INDICATOR -->
+  <div id="typingIndicator">MÎK AI is thinking… ⏳</div>
 
-<!-- HOME -->
-<div id="home">
-  <h2>What can I help with?</h2>
-  <div class="actions">
-    <button onclick="quickPrompt('Create an image')">🎨 Create image</button>
-    <button onclick="quickPrompt('Surprise me')">🎁 Surprise me</button>
-    <button onclick="quickPrompt('Summarize this text')">📄 Summarize</button>
-    <button onclick="quickPrompt('Write code')">💻 Code</button>
-  </div>
-</div>
+  <!-- INPUT BAR -->
+  <footer class="input-bar">
+    <button id="plusBtn">＋</button>
+    <input id="userInput" type="text" placeholder="Ask MÎK AI…" />
+    <button id="sendBtn">➤</button>
+  </footer>
 
-<!-- CHAT -->
-<div id="chat"></div>
-
-<!-- UPLOAD PANEL -->
-<div id="tools">
-  <button onclick="alert('Upload file soon')">📎 Upload file</button>
-  <button onclick="alert('Camera soon')">📷 Camera</button>
-</div>
-
-<!-- PROFILE MODAL -->
-<div id="profile">
-  <h3>👤 Profile</h3>
-  <p><b>Name:</b> Mohammad Israr (MÎK)</p>
-  <p><b>AI:</b> MÎK AI v12.0</p>
-  <button onclick="closeAll()">Close</button>
-</div>
-
-<!-- INPUT -->
-<div id="input-area">
-  <button id="plusBtn">＋</button>
-  <input id="msgInput" placeholder="Ask MÎK AI..." />
-  <button onclick="send()">➤</button>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
