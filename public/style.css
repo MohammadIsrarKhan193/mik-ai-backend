@@ -35,13 +35,25 @@ body {
   width: 220px;
   height: 100%;
   background: #151515;
-  padding: 20px;
+  padding: 15px;
   transition: 0.3s;
-  z-index: 10;
+  overflow-y: auto;
 }
 
 .sidebar.open {
   left: 0;
+}
+
+#chatList button {
+  width: 100%;
+  background: #1e1e1e;
+  border: none;
+  color: white;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
 }
 
 /* WELCOME */
@@ -104,20 +116,4 @@ body {
   border-radius: 20px;
   padding: 10px;
   color: #fff;
-}
-
-/* MODAL */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #222;
-  padding: 20px;
-  border-radius: 10px;
 }
