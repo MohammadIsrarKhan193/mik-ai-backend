@@ -6,52 +6,45 @@ const sidebar = document.getElementById("sidebar");
 const chatList = document.getElementById("chatList");
 
 let chats = JSON.parse(localStorage.getItem("mikChats")) || [];
-let currentChat = null;
+let currentChat;
 
-/* TOGGLE SIDEBAR */
 document.getElementById("menuBtn").onclick = () =>
   sidebar.classList.toggle("open");
 
-/* SEND */
 sendBtn.onclick = send;
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") send();
-});
+input.onkeypress = e => e.key === "Enter" && send();
 
-/* NEW CHAT */
 function newChat() {
-  currentChat = {
-    id: Date.now(),
-    title: "New chat",
-    messages: []
-  };
+  currentChat = { id: Date.now(), messages: [] };
   chats.unshift(currentChat);
-  saveChats();
-  renderChatList();
-  loadChat(currentChat.id);
+  save();
+  renderList();
+  chatArea.innerHTML = "";
 }
 
-/* SEND MESSAGE */
-function send() {
+async function send() {
   const text = input.value.trim();
   if (!text) return;
 
   welcome.style.display = "none";
 
   addMsg(text, "user");
-  currentChat.messages.push({ role: "user", text });
-
-  setTimeout(() => {
-    const reply = "MÎK AI v13 💚 I remember this conversation now.";
-    addMsg(reply, "ai");
-    currentChat.messages.push({ role: "ai", text: reply });
-    saveChats();
-  }, 800);
-
+  currentChat.messages.push({ role: "user", content: text });
   input.value = "";
+
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: currentChat.messages })
+  });
+
+  const data = await res.json();
+  addMsg(data.reply, "ai");
+  currentChat.messages.push({ role: "assistant", content: data.reply });
+
+  save();
 }
 
-/* ADD MESSAGE */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
@@ -60,40 +53,27 @@ function addMsg(text, type) {
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-/* LOAD CHAT */
-function loadChat(id) {
-  chatArea.innerHTML = "";
-  const chat = chats.find(c => c.id === id);
-  if (!chat) return;
-
-  currentChat = chat;
-  welcome.style.display = "none";
-
-  chat.messages.forEach(m =>
-    addMsg(m.text, m.role === "user" ? "user" : "ai")
-  );
-}
-
-/* RENDER SIDEBAR */
-function renderChatList() {
+function renderList() {
   chatList.innerHTML = "";
   chats.forEach(c => {
     const btn = document.createElement("button");
-    btn.textContent = c.messages[0]?.text || "New chat";
+    btn.textContent = c.messages[0]?.content || "New chat";
     btn.onclick = () => loadChat(c.id);
     chatList.appendChild(btn);
   });
 }
 
-/* SAVE */
-function saveChats() {
+function loadChat(id) {
+  chatArea.innerHTML = "";
+  currentChat = chats.find(c => c.id === id);
+  currentChat.messages.forEach(m =>
+    addMsg(m.content, m.role === "user" ? "user" : "ai")
+  );
+}
+
+function save() {
   localStorage.setItem("mikChats", JSON.stringify(chats));
 }
 
-/* INIT */
-if (chats.length) {
-  renderChatList();
-  loadChat(chats[0].id);
-} else {
-  newChat();
-}
+newChat();
+renderList();
