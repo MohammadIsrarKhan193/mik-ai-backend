@@ -1,4 +1,7 @@
+const chatArea = document.getElementById("chatArea");
 const chat = document.getElementById("chat");
+const sendBtn = document.getElementById("sendBtn");
+const welcome = document.getElementById("welcome");
 const input = document.getElementById("msgInput");
 const sidebar = document.getElementById("sidebar");
 const chatList = document.getElementById("chatList");
