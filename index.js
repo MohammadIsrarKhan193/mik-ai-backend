@@ -13,37 +13,28 @@ app.post("/chat", async (req, res) => {
   try {
     const { message, history } = req.body;
 
-    if (!message) return res.json({ reply: "Say something, Jani 🙂" });
+    if (!message) return res.json({ reply: "Say something 🙂" });
 
     const lower = message.toLowerCase();
 
-    // 🎨 IMAGE GENERATION
+    // 🎨 Image generation
     if (
-      lower.includes("create") ||
-      lower.includes("generate") ||
-      lower.includes("make") ||
       lower.includes("image") ||
       lower.includes("logo") ||
-      lower.includes("dp")
+      lower.includes("generate") ||
+      lower.includes("create")
     ) {
       const seed = Math.floor(Math.random() * 100000);
-      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(
-        message
-      )}?width=1024&height=1024&seed=${seed}&model=flux`;
-
       return res.json({
         type: "image",
-        image: imageUrl
+        image: `https://pollinations.ai/p/${encodeURIComponent(
+          message
+        )}?width=1024&height=1024&seed=${seed}`
       });
     }
 
-    // 🧠 MEMORY-AWARE CHAT
     const messages = [
-      {
-        role: "system",
-        content:
-          "You are MÎK AI, a friendly, smart assistant created by Mohammad Israr (MÎK)."
-      },
+      { role: "system", content: "You are MÎK AI, created by Mohammad Israr." },
       ...(history || []),
       { role: "user", content: message }
     ];
@@ -59,9 +50,8 @@ app.post("/chat", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
     res.json({ reply: "Brain overload 😵 Try again." });
   }
 });
 
-app.listen(3000, () => console.log("MÎK AI V19 running 🚀"));
+app.listen(3000, () => console.log("MÎK AI running 🚀"));
