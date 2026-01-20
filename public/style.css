@@ -87,7 +87,7 @@ body {
   gap: 14px;
 }
 
-/* CHAT BUBBLES */
+/* BUBBLES */
 .bubble {
   max-width: 70%;
   padding: 14px;
@@ -108,7 +108,7 @@ body {
   border-bottom-left-radius: 4px;
 }
 
-/* INPUT BAR */
+/* INPUT */
 .input-bar {
   display: flex;
   gap: 10px;
@@ -135,20 +135,19 @@ body {
   cursor: pointer;
 }
 
-/* RIGHT PANEL */
+.mic.recording {
+  background: red;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,0,0,.7); }
+  70% { box-shadow: 0 0 0 12px rgba(255,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); }
+}
+
+/* RIGHT */
 .right-panel {
   background: #11131a;
   padding: 20px;
-}
-
-.right-panel ul {
-  list-style: none;
-  margin-top: 10px;
-}
-
-.right-panel li {
-  padding: 8px;
-  background: #1b1e2a;
-  border-radius: 8px;
-  margin-bottom: 8px;
 }
