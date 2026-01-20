@@ -2,8 +2,28 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const micBtn = document.getElementById("micBtn");
 const sendBtn = document.getElementById("sendBtn");
+const menuBtn = document.getElementById("menuBtn");
+const addBtn = document.getElementById("addBtn");
+const sidebar = document.getElementById("sidebar");
 
 let recognizing = false;
+
+/* SIDEBAR TOGGLE */
+menuBtn.onclick = () => {
+  sidebar.classList.toggle("hidden");
+};
+
+/* PLUS BUTTON */
+addBtn.onclick = () => {
+  alert("Upload & tools coming soon 🚀");
+};
+
+/* NEW CHAT */
+function newChat() {
+  chat.innerHTML = "";
+  document.getElementById("welcome")?.remove();
+  sidebar.classList.add("hidden");
+}
 
 /* SPEECH RECOGNITION */
 const SpeechRecognition =
@@ -11,17 +31,11 @@ const SpeechRecognition =
 
 const recognition = new SpeechRecognition();
 recognition.lang = "en-US";
-recognition.interimResults = false;
-recognition.continuous = false;
 
-/* MIC EVENTS */
-micBtn.addEventListener("click", () => {
-  if (recognizing) {
-    recognition.stop();
-    return;
-  }
-  recognition.start();
-});
+micBtn.onclick = () => {
+  if (recognizing) recognition.stop();
+  else recognition.start();
+};
 
 recognition.onstart = () => {
   recognizing = true;
@@ -33,13 +47,12 @@ recognition.onend = () => {
   micBtn.classList.remove("listening");
 };
 
-recognition.onresult = (e) => {
-  const text = e.results[0][0].transcript;
-  input.value = text;
+recognition.onresult = e => {
+  input.value = e.results[0][0].transcript;
   send();
 };
 
-/* CHAT */
+/* CHAT UI */
 function addMsg(text, type) {
   const div = document.createElement("div");
   div.className = `msg ${type}`;
@@ -48,13 +61,12 @@ function addMsg(text, type) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* SEND */
+/* SEND MESSAGE */
 async function send() {
   const text = input.value.trim();
   if (!text) return;
 
   document.getElementById("welcome")?.remove();
-
   addMsg(text, "user");
   input.value = "";
 
@@ -65,16 +77,17 @@ async function send() {
       body: JSON.stringify({ message: text })
     });
 
-    const data = await res.json();
-    addMsg(data.reply || "⚠️ No response", "ai");
+    if (!res.ok) throw new Error("API failed");
 
-  } catch {
+    const data = await res.json();
+    addMsg(data.reply || "No response", "ai");
+
+  } catch (err) {
     addMsg("Brain overload 😵 Try again.", "ai");
   }
 }
 
 sendBtn.onclick = send;
-
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") send();
 });
