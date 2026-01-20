@@ -8,72 +8,70 @@
 </head>
 <body>
 
-  <!-- APP ROOT -->
-  <div class="app">
+<div class="app">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="logo">✨ MÎK AI</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">✨ MÎK AI</div>
+    <nav class="menu">
+      <button class="active">AI Chat Helper</button>
+      <button>Templates</button>
+      <button>My Projects</button>
+      <button>Statistics</button>
+      <button>Settings</button>
+    </nav>
 
-      <nav class="menu">
-        <button class="active">AI Chat Helper</button>
-        <button>Templates</button>
-        <button>My Projects</button>
-        <button>Statistics</button>
-        <button>Settings</button>
-      </nav>
+    <div class="pro-card">
+      <p>Pro Plan</p>
+      <small>Strengthen AI power</small>
+      <button>Get PRO</button>
+    </div>
+  </aside>
 
-      <div class="pro-card">
-        <p>Pro Plan</p>
-        <small>Strengthen AI power</small>
-        <button>Get PRO</button>
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <h1>MÎK AI chat helper</h1>
+      <input type="search" placeholder="Search…" />
+      <div class="icons">
+        <span>🔔</span>
+        <span>👤</span>
       </div>
-    </aside>
+    </header>
 
-    <!-- MAIN -->
-    <main class="main">
+    <!-- CHAT AREA -->
+    <section class="chat-area" id="chat">
+      <div class="bubble ai">
+        👋 Welcome to <b>MÎK AI</b><br>
+        This is Phase 2: Chat UI only.
+      </div>
+    </section>
 
-      <!-- HEADER -->
-      <header class="topbar">
-        <h1>MÎK AI chat helper</h1>
-        <input type="search" placeholder="Search…" />
-        <div class="icons">
-          <span>🔔</span>
-          <span>👤</span>
-        </div>
-      </header>
+    <!-- INPUT BAR -->
+    <footer class="input-bar">
+      <button class="icon">＋</button>
+      <input id="msgInput" type="text" placeholder="Start typing…" />
+      <button class="icon">🎤</button>
+      <button class="send" id="sendBtn">➤</button>
+    </footer>
 
-      <!-- WORKSPACE -->
-      <section class="workspace">
-        <div class="placeholder">
-          <h2>Welcome to MÎK AI</h2>
-          <p>UI foundation is locked. Features will come step by step.</p>
-        </div>
-      </section>
+  </main>
 
-      <!-- INPUT BAR -->
-      <footer class="input-bar">
-        <button class="icon">＋</button>
-        <input type="text" placeholder="Start typing…" disabled />
-        <button class="icon">🎤</button>
-        <button class="send">➤</button>
-      </footer>
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <h3>History</h3>
+    <ul>
+      <li>New Chat</li>
+      <li>UI Test</li>
+      <li>Design Review</li>
+    </ul>
+    <button class="clear">Clear history</button>
+  </aside>
 
-    </main>
+</div>
 
-    <!-- RIGHT PANEL -->
-    <aside class="right-panel">
-      <h3>History</h3>
-      <ul>
-        <li>Create welcome form</li>
-        <li>Instructions</li>
-        <li>Career tips</li>
-      </ul>
-      <button class="clear">Clear history</button>
-    </aside>
-
-  </div>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
