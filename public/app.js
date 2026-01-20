@@ -1,76 +1,80 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
+const micBtn = document.getElementById("micBtn");
 const sendBtn = document.getElementById("sendBtn");
-const voiceBtn = document.getElementById("voiceBtn");
-const sidebarBtn = document.getElementById("sidebarBtn");
-const sidebar = document.getElementById("sidebar");
-const newChatBtn = document.getElementById("newChatBtn");
 
-// --- v11.0 BRAIN LOGIC ---
-let myId = localStorage.getItem("mik_user_id");
-if (!myId) {
-    myId = prompt("Enter your Profile Name:") || "Guest";
-    localStorage.setItem("mik_user_id", myId);
-}
-document.getElementById("welcomeScreen").querySelector('h1').innerText = `Welcome, ${myId}`;
+let recognizing = false;
 
-// --- VOICE & SIDEBAR ---
-let voiceEnabled = true;
-const synth = window.speechSynthesis;
+/* SPEECH RECOGNITION */
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
 
-voiceBtn.onclick = () => {
-    voiceEnabled = !voiceEnabled;
-    voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+recognition.interimResults = false;
+recognition.continuous = false;
+
+/* MIC EVENTS */
+micBtn.addEventListener("click", () => {
+  if (recognizing) {
+    recognition.stop();
+    return;
+  }
+  recognition.start();
+});
+
+recognition.onstart = () => {
+  recognizing = true;
+  micBtn.classList.add("listening");
 };
 
-sidebarBtn.onclick = () => sidebar.classList.toggle("visible");
-
-newChatBtn.onclick = () => {
-    chat.innerHTML = "";
-    sidebar.classList.remove("visible");
-    addMsg("New chat started! How can I help?", "ai");
+recognition.onend = () => {
+  recognizing = false;
+  micBtn.classList.remove("listening");
 };
 
-function speak(text) {
-    if (!voiceEnabled || !synth) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    synth.cancel();
-    synth.speak(utter);
-}
+recognition.onresult = (e) => {
+  const text = e.results[0][0].transcript;
+  input.value = text;
+  send();
+};
 
+/* CHAT */
 function addMsg(text, type) {
-    const div = document.createElement("div");
-    div.className = `msg ${type}`;
-    div.innerText = text;
-    chat.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-    if (type === "ai") speak(text);
+  const div = document.createElement("div");
+  div.className = `msg ${type}`;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-// --- UPDATED SEND (v15.0 Style + v11.0 Logic) ---
+/* SEND */
 async function send() {
-    const text = input.value.trim();
-    if (!text) return;
+  const text = input.value.trim();
+  if (!text) return;
 
-    document.getElementById("welcomeScreen")?.remove();
-    addMsg(text, "user");
-    input.value = "";
+  document.getElementById("welcome")?.remove();
 
-    try {
-        const res = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                message: text,
-                userId: myId // Don't forget this, Jani!
-            })
-        });
-        const data = await res.json();
-        addMsg(data.reply || "Server is tired.", "ai");
-    } catch {
-        addMsg("Connection error 😢", "ai");
-    }
+  addMsg(text, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+    addMsg(data.reply || "⚠️ No response", "ai");
+
+  } catch {
+    addMsg("Brain overload 😵 Try again.", "ai");
+  }
 }
 
 sendBtn.onclick = send;
-input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send();
+});
