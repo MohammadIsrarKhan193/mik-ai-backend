@@ -11,18 +11,19 @@ const groq = new Groq({
 
 app.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, history } = req.body;
+
     if (!message) return res.json({ reply: "Say something, Jani 🙂" });
 
     const lower = message.toLowerCase();
 
-    // 🎨 IMAGE GENERATION (ChatGPT-style)
+    // 🎨 IMAGE GENERATION
     if (
       lower.includes("create") ||
       lower.includes("generate") ||
       lower.includes("make") ||
-      lower.includes("logo") ||
       lower.includes("image") ||
+      lower.includes("logo") ||
       lower.includes("dp")
     ) {
       const seed = Math.floor(Math.random() * 100000);
@@ -32,22 +33,24 @@ app.post("/chat", async (req, res) => {
 
       return res.json({
         type: "image",
-        prompt: message,
         image: imageUrl
       });
     }
 
-    // 💬 TEXT CHAT
+    // 🧠 MEMORY-AWARE CHAT
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are MÎK AI, a friendly, smart assistant created by Mohammad Israr (MÎK)."
+      },
+      ...(history || []),
+      { role: "user", content: message }
+    ];
+
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are MÎK AI, a professional, friendly assistant created by Mohammad Israr. Keep replies clear and helpful."
-        },
-        { role: "user", content: message }
-      ]
+      messages
     });
 
     res.json({
@@ -61,7 +64,4 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log("MÎK AI V18.0 running 🚀")
-);
+app.listen(3000, () => console.log("MÎK AI V19 running 🚀"));
