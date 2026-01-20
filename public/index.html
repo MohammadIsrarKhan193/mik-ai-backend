@@ -8,16 +8,32 @@
 </head>
 <body>
 
-<header>
-  <h1>MÎK AI</h1>
-  <button id="voiceBtn">🎤</button>
-</header>
+<div class="app">
 
-<div id="chat"></div>
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <h2>MÎK AI</h2>
+    <button id="newChat">➕ New Chat</button>
+    <div id="history"></div>
+  </aside>
 
-<div id="input-area">
-  <input id="msgInput" placeholder="Ask MÎK AI..." />
-  <button onclick="send()">➤</button>
+  <!-- MAIN -->
+  <main>
+    <header>
+      <button id="toggleSidebar">☰</button>
+      <span>MÎK AI</span>
+    </header>
+
+    <div id="chat"></div>
+
+    <!-- INPUT BAR -->
+    <div id="input-area">
+      <button id="voiceBtn">🎤</button>
+      <input id="msgInput" placeholder="Ask MÎK AI..." />
+      <button id="sendBtn">➤</button>
+    </div>
+  </main>
+
 </div>
 
 <script src="app.js"></script>
