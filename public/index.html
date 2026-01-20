@@ -1,41 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MÎK AI v15.1</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>MÎK AI v17</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <header>
-  <button id="sidebarBtn">☰</button>
+  <button id="menuBtn">☰</button>
   <h1>MÎK AI</h1>
-  <div>
-    <button id="voiceBtn">🎤</button>
-    <button>👤</button>
+  <div class="right-icons">
+    <button id="profileBtn">👤</button>
   </div>
 </header>
 
-<aside id="sidebar">
-  <h2>Chats</h2>
-  <button id="newChatBtn">➕ New Chat</button>
-</aside>
+<div id="chat"></div>
 
-<main>
-  <div id="welcome">
-    <h2>Welcome to MÎK AI</h2>
-    <p>Your personal AI assistant 💚</p>
-  </div>
+<div id="welcome">
+  <h2>What can I help with?</h2>
+</div>
 
-  <!-- 🔥 FIXED CHAT CONTAINER -->
-  <div id="chat"></div>
+<footer>
+  <button id="addBtn">＋</button>
 
-  <div id="inputBar">
-    <input id="msgInput" placeholder="Message MÎK AI..." />
-    <button id="sendBtn">➤</button>
-  </div>
-</main>
+  <input
+    id="msgInput"
+    placeholder="Ask MÎK AI..."
+    autocomplete="off"
+  />
+
+  <button id="micBtn" title="Hold to talk">
+    🎤
+  </button>
+
+  <button id="sendBtn">➤</button>
+</footer>
 
 <script src="app.js"></script>
 </body>
