@@ -1,63 +1,67 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
-const micBtn = document.getElementById("micBtn");
+const voiceBtn = document.getElementById("voiceBtn");
 
-let recognition;
-let listening = false;
-
-/* Add chat bubble */
+/* ===============================
+   CHAT BUBBLE FUNCTION
+================================ */
 function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = `bubble ${type}`;
-  div.innerText = text;
-  chat.appendChild(div);
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${type}`;
+  bubble.innerText = text;
+  chat.appendChild(bubble);
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* Text send */
-sendBtn.onclick = () => {
+/* ===============================
+   SEND TEXT → AI
+================================ */
+sendBtn.onclick = async () => {
   const text = input.value.trim();
   if (!text) return;
+
   addMessage(text, "user");
   input.value = "";
+
+  const thinking = document.createElement("div");
+  thinking.className = "bubble ai";
+  thinking.innerText = "Thinking…";
+  chat.appendChild(thinking);
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+    thinking.innerText = data.reply;
+  } catch (err) {
+    thinking.innerText = "Brain overload 😵 Try again.";
+  }
 };
 
-/* Voice setup */
-if ("webkitSpeechRecognition" in window) {
-  recognition = new webkitSpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.continuous = false;
-  recognition.interimResults = false;
+/* ===============================
+   VOICE INPUT (NO AI LOGIC HERE)
+================================ */
+voiceBtn.onclick = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  recognition.onresult = e => {
-    const transcript = e.results[0][0].transcript;
-    addMessage(transcript, "user");
-  };
-
-  recognition.onend = () => {
-    listening = false;
-    micBtn.classList.remove("recording");
-  };
-}
-
-/* Mic click */
-micBtn.onclick = () => {
-  if (!recognition) {
-    alert("Voice not supported on this browser");
+  if (!SpeechRecognition) {
+    alert("Voice not supported");
     return;
   }
 
-  if (!listening) {
-    recognition.start();
-    listening = true;
-    micBtn.classList.add("recording");
-  } else {
-    recognition.stop();
-  }
-};
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.start();
 
-/* Enter key */
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendBtn.click();
-});
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    input.value = text;
+  };
+};
