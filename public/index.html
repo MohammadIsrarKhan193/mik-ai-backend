@@ -2,32 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MÎK AI</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>MÎK AI v17.1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="hidden">
+  <h3>MÎK AI</h3>
+  <button onclick="newChat()">➕ New Chat</button>
+  <p class="soon">More features coming…</p>
+</div>
 
 <header>
   <button id="menuBtn">☰</button>
   <h1>MÎK AI</h1>
-  <button id="voiceBtn">🎤</button>
+  <button id="profileBtn">👤</button>
 </header>
 
-<aside id="sidebar" class="hidden">
-  <button id="newChat">➕ New Chat</button>
-</aside>
+<div id="chat"></div>
 
-<main id="chat">
-  <div id="welcome">
-    <h2>Hey Jani 👋</h2>
-    <p>Ask MÎK AI anything</p>
-  </div>
-</main>
+<div id="welcome">
+  <h2>What can I help with?</h2>
+</div>
 
-<footer id="input-area">
+<footer>
+  <button id="addBtn">＋</button>
   <input id="msgInput" placeholder="Ask MÎK AI..." />
-  <button onclick="send()">➤</button>
+  <button id="micBtn">🎤</button>
+  <button id="sendBtn">➤</button>
 </footer>
 
 <script src="app.js"></script>
