@@ -1,35 +1,58 @@
-const express = require("express");
-const Groq = require("groq-sdk");
+const chat = document.getElementById("chat");
+const input = document.getElementById("msgInput");
+const voiceBtn = document.getElementById("voiceBtn");
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const synth = window.speechSynthesis;
 
-const app = express();
-app.use(express.json());
-app.use(express.static("public"));
+let voice = true;
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
-});
+/* 🎤 Voice toggle */
+voiceBtn.onclick = () => {
+  voice = !voice;
+  voiceBtn.textContent = voice ? "🎤" : "🔇";
+};
 
-app.post("/chat", async (req, res) => {
-  try {
-    const { message } = req.body;
-    if (!message) return res.json({ reply: "Say something Jani 😊" });
+/* ☰ Sidebar */
+menuBtn.onclick = () => {
+  sidebar.classList.toggle("hidden");
+};
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: "You are MÎK AI, created by Mohammad Israr." },
-        { role: "user", content: message }
-      ],
-      model: "llama-3.3-70b-versatile"
-    });
+/* 💬 Add bubble */
+function addMsg(text, type) {
+  const div = document.createElement("div");
+  div.className = `msg ${type}`;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 
-    res.json({ reply: completion.choices[0].message.content });
-
-  } catch (err) {
-    console.error("AI ERROR:", err);
-    res.status(500).json({ reply: "Brain busy 🧠 Try again." });
+  if (type === "ai" && voice) {
+    const u = new SpeechSynthesisUtterance(text);
+    synth.cancel();
+    synth.speak(u);
   }
-});
+}
 
-app.listen(process.env.PORT || 3000, () =>
-  console.log("MÎK AI backend running")
-);
+/* 🚀 Send */
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  document.getElementById("welcome")?.remove();
+  sidebar.classList.add("hidden");
+
+  addMsg(text, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    addMsg(data.reply, "ai");
+  } catch {
+    addMsg("Brain overload 😵 Try again.", "ai");
+  }
+}
