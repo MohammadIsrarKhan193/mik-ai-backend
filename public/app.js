@@ -6,71 +6,59 @@ const sidebarBtn = document.getElementById("sidebarBtn");
 const sidebar = document.getElementById("sidebar");
 const newChatBtn = document.getElementById("newChatBtn");
 
-// --- v11.0 BRAIN LOGIC ---
-let myId = localStorage.getItem("mik_user_id");
-if (!myId) {
-    myId = prompt("Enter your Profile Name:") || "Guest";
-    localStorage.setItem("mik_user_id", myId);
-}
-document.getElementById("welcomeScreen").querySelector('h1').innerText = `Welcome, ${myId}`;
-
-// --- VOICE & SIDEBAR ---
-let voiceEnabled = true;
+let voiceOn = true;
 const synth = window.speechSynthesis;
 
+sidebarBtn.onclick = () => sidebar.classList.toggle("show");
+
 voiceBtn.onclick = () => {
-    voiceEnabled = !voiceEnabled;
-    voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
+  voiceOn = !voiceOn;
+  voiceBtn.textContent = voiceOn ? "🎤" : "🔇";
 };
 
-sidebarBtn.onclick = () => sidebar.classList.toggle("visible");
-
 newChatBtn.onclick = () => {
-    chat.innerHTML = "";
-    sidebar.classList.remove("visible");
-    addMsg("New chat started! How can I help?", "ai");
+  chat.innerHTML = "";
 };
 
 function speak(text) {
-    if (!voiceEnabled || !synth) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    synth.cancel();
-    synth.speak(utter);
+  if (!voiceOn) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  synth.cancel();
+  synth.speak(u);
 }
 
 function addMsg(text, type) {
-    const div = document.createElement("div");
-    div.className = `msg ${type}`;
-    div.innerText = text;
-    chat.appendChild(div);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-    if (type === "ai") speak(text);
+  document.getElementById("welcome")?.remove();
+  const div = document.createElement("div");
+  div.className = `msg ${type}`;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  if (type === "ai") speak(text);
 }
 
-// --- UPDATED SEND (v15.0 Style + v11.0 Logic) ---
 async function send() {
-    const text = input.value.trim();
-    if (!text) return;
+  const text = input.value.trim();
+  if (!text) return;
 
-    document.getElementById("welcomeScreen")?.remove();
-    addMsg(text, "user");
-    input.value = "";
+  addMsg(text, "user");
+  input.value = "";
 
-    try {
-        const res = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                message: text,
-                userId: myId // Don't forget this, Jani!
-            })
-        });
-        const data = await res.json();
-        addMsg(data.reply || "Server is tired.", "ai");
-    } catch {
-        addMsg("Connection error 😢", "ai");
-    }
+  try {
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    addMsg(data.reply || "No reply 😢", "ai");
+  } catch {
+    addMsg("Brain overload 😵 Try again.", "ai");
+  }
 }
 
 sendBtn.onclick = send;
-input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send();
+});
