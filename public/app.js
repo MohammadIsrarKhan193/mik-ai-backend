@@ -1,73 +1,51 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
-const micBtn = document.getElementById("micBtn");
-const sendBtn = document.getElementById("sendBtn");
-const menuBtn = document.getElementById("menuBtn");
-const addBtn = document.getElementById("addBtn");
-const sidebar = document.getElementById("sidebar");
+const voiceBtn = document.getElementById("voiceBtn");
 
-let recognizing = false;
+let voiceEnabled = true;
+const synth = window.speechSynthesis;
 
-/* SIDEBAR TOGGLE */
-menuBtn.onclick = () => {
-  sidebar.classList.toggle("hidden");
+voiceBtn.onclick = () => {
+  voiceEnabled = !voiceEnabled;
+  voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
 };
 
-/* PLUS BUTTON */
-addBtn.onclick = () => {
-  alert("Upload & tools coming soon 🚀");
-};
-
-/* NEW CHAT */
-function newChat() {
-  chat.innerHTML = "";
-  document.getElementById("welcome")?.remove();
-  sidebar.classList.add("hidden");
+function speak(text) {
+  if (!voiceEnabled || !synth) return;
+  const u = new SpeechSynthesisUtterance(text);
+  synth.cancel();
+  synth.speak(u);
 }
 
-/* SPEECH RECOGNITION */
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-
-const recognition = new SpeechRecognition();
-recognition.lang = "en-US";
-
-micBtn.onclick = () => {
-  if (recognizing) recognition.stop();
-  else recognition.start();
-};
-
-recognition.onstart = () => {
-  recognizing = true;
-  micBtn.classList.add("listening");
-};
-
-recognition.onend = () => {
-  recognizing = false;
-  micBtn.classList.remove("listening");
-};
-
-recognition.onresult = e => {
-  input.value = e.results[0][0].transcript;
-  send();
-};
-
-/* CHAT UI */
-function addMsg(text, type) {
+function addUser(text) {
   const div = document.createElement("div");
-  div.className = `msg ${type}`;
+  div.className = "msg user";
   div.innerText = text;
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
 }
 
-/* SEND MESSAGE */
+function addAIText(text) {
+  const div = document.createElement("div");
+  div.className = "msg ai";
+  div.innerText = text;
+  chat.appendChild(div);
+  speak(text);
+}
+
+function addAIImage(url) {
+  const div = document.createElement("div");
+  div.className = "msg ai img-card";
+  div.innerHTML = `<img src="${url}" />`;
+  chat.appendChild(div);
+}
+
 async function send() {
   const text = input.value.trim();
   if (!text) return;
 
   document.getElementById("welcome")?.remove();
-  addMsg(text, "user");
+
+  addUser(text);
   input.value = "";
 
   try {
@@ -77,17 +55,17 @@ async function send() {
       body: JSON.stringify({ message: text })
     });
 
-    if (!res.ok) throw new Error("API failed");
-
     const data = await res.json();
-    addMsg(data.reply || "No response", "ai");
 
-  } catch (err) {
-    addMsg("Brain overload 😵 Try again.", "ai");
+    if (data.type === "image") {
+      addAIImage(data.image);
+    } else {
+      addAIText(data.reply);
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch {
+    addAIText("Brain overload 😵 Try again.");
   }
 }
-
-sendBtn.onclick = send;
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") send();
-});
