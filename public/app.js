@@ -1,47 +1,33 @@
 const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
 const voiceBtn = document.getElementById("voiceBtn");
+const newChatBtn = document.getElementById("newChat");
+const historyBox = document.getElementById("history");
 
 let memory = JSON.parse(localStorage.getItem("mik-memory")) || [];
-let listening = false;
 
-// 🔊 Speech
+/* 🔊 Voice */
 const synth = window.speechSynthesis;
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 
-const recognition = SpeechRecognition
-  ? new SpeechRecognition()
-  : null;
+const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
 if (recognition) {
   recognition.lang = "en-US";
   recognition.onresult = e => {
-    const text = e.results[0][0].transcript;
-    input.value = text;
+    input.value = e.results[0][0].transcript;
     send();
   };
 }
 
-// 🎤 Voice Button
-voiceBtn.onclick = () => {
-  if (!recognition) return alert("Voice not supported");
-  listening ? recognition.stop() : recognition.start();
-  listening = !listening;
-  voiceBtn.textContent = listening ? "🛑" : "🎤";
-};
+voiceBtn.onclick = () => recognition && recognition.start();
 
-// 🗣 Speak AI
-function speak(text) {
-  const u = new SpeechSynthesisUtterance(text);
-  synth.cancel();
-  synth.speak(u);
-}
-
-// 💬 UI
-function addMsg(text, who) {
+/* 💬 UI */
+function addMsg(text, role) {
   const div = document.createElement("div");
-  div.className = `msg ${who}`;
+  div.className = `msg ${role}`;
   div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
@@ -52,13 +38,12 @@ function addImage(url) {
   div.className = "msg ai";
   div.innerHTML = `<img src="${url}">`;
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
 }
 
-// 🧠 Load Memory
+/* 🧠 Load memory */
 memory.forEach(m => addMsg(m.content, m.role));
 
-// 🚀 Send
+/* 🚀 Send */
 async function send() {
   const text = input.value.trim();
   if (!text) return;
@@ -83,7 +68,7 @@ async function send() {
       addImage(data.image);
     } else {
       addMsg(data.reply, "ai");
-      speak(data.reply);
+      synth.speak(new SpeechSynthesisUtterance(data.reply));
       memory.push({ role: "assistant", content: data.reply });
     }
 
@@ -93,3 +78,10 @@ async function send() {
     addMsg("Brain overload 😵 Try again.", "ai");
   }
 }
+
+sendBtn.onclick = send;
+newChatBtn.onclick = () => {
+  chat.innerHTML = "";
+  memory = [];
+  localStorage.removeItem("mik-memory");
+};
