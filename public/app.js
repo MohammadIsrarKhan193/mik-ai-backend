@@ -2,70 +2,94 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const voiceBtn = document.getElementById("voiceBtn");
 
-let voiceEnabled = true;
-const synth = window.speechSynthesis;
+let memory = JSON.parse(localStorage.getItem("mik-memory")) || [];
+let listening = false;
 
+// 🔊 Speech
+const synth = window.speechSynthesis;
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = SpeechRecognition
+  ? new SpeechRecognition()
+  : null;
+
+if (recognition) {
+  recognition.lang = "en-US";
+  recognition.onresult = e => {
+    const text = e.results[0][0].transcript;
+    input.value = text;
+    send();
+  };
+}
+
+// 🎤 Voice Button
 voiceBtn.onclick = () => {
-  voiceEnabled = !voiceEnabled;
-  voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
+  if (!recognition) return alert("Voice not supported");
+  listening ? recognition.stop() : recognition.start();
+  listening = !listening;
+  voiceBtn.textContent = listening ? "🛑" : "🎤";
 };
 
+// 🗣 Speak AI
 function speak(text) {
-  if (!voiceEnabled || !synth) return;
   const u = new SpeechSynthesisUtterance(text);
   synth.cancel();
   synth.speak(u);
 }
 
-function addUser(text) {
+// 💬 UI
+function addMsg(text, who) {
   const div = document.createElement("div");
-  div.className = "msg user";
+  div.className = `msg ${who}`;
   div.innerText = text;
   chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function addAIText(text) {
+function addImage(url) {
   const div = document.createElement("div");
   div.className = "msg ai";
-  div.innerText = text;
+  div.innerHTML = `<img src="${url}">`;
   chat.appendChild(div);
-  speak(text);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function addAIImage(url) {
-  const div = document.createElement("div");
-  div.className = "msg ai img-card";
-  div.innerHTML = `<img src="${url}" />`;
-  chat.appendChild(div);
-}
+// 🧠 Load Memory
+memory.forEach(m => addMsg(m.content, m.role));
 
+// 🚀 Send
 async function send() {
   const text = input.value.trim();
   if (!text) return;
 
-  document.getElementById("welcome")?.remove();
-
-  addUser(text);
+  addMsg(text, "user");
+  memory.push({ role: "user", content: text });
   input.value = "";
 
   try {
     const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({
+        message: text,
+        history: memory.slice(-6)
+      })
     });
 
     const data = await res.json();
 
     if (data.type === "image") {
-      addAIImage(data.image);
+      addImage(data.image);
     } else {
-      addAIText(data.reply);
+      addMsg(data.reply, "ai");
+      speak(data.reply);
+      memory.push({ role: "assistant", content: data.reply });
     }
 
-    chat.scrollTop = chat.scrollHeight;
+    localStorage.setItem("mik-memory", JSON.stringify(memory));
 
   } catch {
-    addAIText("Brain overload 😵 Try again.");
+    addMsg("Brain overload 😵 Try again.", "ai");
   }
 }
