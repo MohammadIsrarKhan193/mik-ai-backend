@@ -116,3 +116,40 @@ footer button {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* SIDEBAR */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100%;
+  background: #111;
+  padding: 16px;
+  border-right: 1px solid #222;
+  z-index: 999;
+}
+
+#sidebar.hidden {
+  display: none;
+}
+
+#sidebar h3 {
+  color: #10a37f;
+  margin-bottom: 16px;
+}
+
+#sidebar button {
+  width: 100%;
+  padding: 12px;
+  background: #10a37f;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+#sidebar .soon {
+  margin-top: 20px;
+  color: #777;
+}
