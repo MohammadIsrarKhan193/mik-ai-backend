@@ -1,33 +1,85 @@
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const openBtn = document.getElementById("openSidebar");
-const closeBtn = document.getElementById("closeSidebar");
+/* ======================
+   MÎK AI – Phase 5
+   Chat Switching Logic
+====================== */
 
-const chatArea = document.getElementById("chatArea");
-const input = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
+const chatContainer = document.getElementById("chat-messages");
+const input = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+const newChatBtn = document.getElementById("new-chat-btn");
+const chatList = document.getElementById("chat-list");
 
-/* SIDEBAR TOGGLE */
-openBtn.onclick = () => {
-  sidebar.classList.add("open");
-  overlay.classList.add("show");
-};
+/* Chat state */
+let chats = {};
+let currentChatId = null;
 
-closeBtn.onclick = overlay.onclick = () => {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-};
+/* Create new chat */
+function createNewChat() {
+  const id = "chat_" + Date.now();
+  chats[id] = [];
+  currentChatId = id;
 
-/* CHAT MESSAGE UI */
-sendBtn.onclick = () => {
+  renderChatList();
+  renderMessages();
+}
+
+/* Render sidebar chat list */
+function renderChatList() {
+  chatList.innerHTML = "";
+
+  Object.keys(chats).forEach((id) => {
+    const div = document.createElement("div");
+    div.className = "chat-item";
+    div.textContent = "New chat";
+    div.onclick = () => {
+      currentChatId = id;
+      renderMessages();
+    };
+    chatList.appendChild(div);
+  });
+}
+
+/* Render messages */
+function renderMessages() {
+  chatContainer.innerHTML = "";
+
+  if (!currentChatId) return;
+
+  chats[currentChatId].forEach(msg => {
+    const bubble = document.createElement("div");
+    bubble.className = msg.role === "user" ? "msg user" : "msg ai";
+    bubble.textContent = msg.text;
+    chatContainer.appendChild(bubble);
+  });
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+/* Send message */
+function sendMessage() {
   const text = input.value.trim();
-  if (!text) return;
+  if (!text || !currentChatId) return;
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble user";
-  bubble.textContent = text;
-  chatArea.appendChild(bubble);
-
+  chats[currentChatId].push({ role: "user", text });
   input.value = "";
-  chatArea.scrollTop = chatArea.scrollHeight;
-};
+  renderMessages();
+
+  /* Placeholder AI reply */
+  setTimeout(() => {
+    chats[currentChatId].push({
+      role: "ai",
+      text: "🧠 MÎK AI will respond here (AI next phase)"
+    });
+    renderMessages();
+  }, 600);
+}
+
+/* Events */
+sendBtn.onclick = sendMessage;
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+newChatBtn.onclick = createNewChat;
+
+/* Init */
+createNewChat();
