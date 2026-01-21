@@ -1,40 +1,14 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
 
-// We use /tmp because Render allows writing files there more easily
-const MEMORY_FILE = "/tmp/memory.json";
+const FILE = "./memory.json";
 
-function loadMemory() {
-  try {
-    if (!fs.existsSync(MEMORY_FILE)) {
-      // Create an empty file if it doesn't exist
-      fs.writeFileSync(MEMORY_FILE, JSON.stringify([]));
-      return [];
-    }
-    return JSON.parse(fs.readFileSync(MEMORY_FILE, "utf8"));
-  } catch (err) {
-    console.error("Memory load error:", err);
-    return [];
+export function getMemory() {
+  if (!fs.existsSync(FILE)) {
+    fs.writeFileSync(FILE, "[]");
   }
+  return JSON.parse(fs.readFileSync(FILE));
 }
 
-function saveMemory(memory) {
-  try {
-    fs.writeFileSync(MEMORY_FILE, JSON.stringify(memory, null, 2));
-  } catch (err) {
-    console.error("Memory save error:", err);
-  }
+export function saveMemory(memory) {
+  fs.writeFileSync(FILE, JSON.stringify(memory.slice(-20), null, 2));
 }
-
-function addMemory(role, content) {
-  const memory = loadMemory();
-  memory.push({ role, content });
-  const trimmed = memory.slice(-20);
-  saveMemory(trimmed);
-}
-
-function getMemory() {
-  return loadMemory();
-}
-
-module.exports = { addMemory, getMemory };
