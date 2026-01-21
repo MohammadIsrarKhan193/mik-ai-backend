@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MÎK AI</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
 
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">✨ MÎK AI</div>
+
+    <nav class="menu">
+      <button class="active">AI Chat Helper</button>
+      <button>Templates</button>
+      <button>My Projects</button>
+      <button>Statistics</button>
+      <button>Settings</button>
+    </nav>
+
+    <div class="pro-card">
+      <p>Pro Plan</p>
+      <span>$10 / mo</span>
+      <button>Get PRO</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP HEADER -->
+    <header class="topbar">
+      <h1>MÎK AI chat helper</h1>
+      <input type="search" placeholder="Search..." />
+      <div class="top-icons">
+        <span>🔔</span>
+        <span>👤</span>
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <section class="workspace">
+      <div class="editor-tabs">
+        <button>HTML</button>
+        <button>CSS</button>
+        <button class="active">JS</button>
+      </div>
+
+      <pre class="code-box">
+let cancelButton = document.getElementById("cancel-button");
+let sendButton = document.getElementById("send-button");
+
+cancelButton.addEventListener("click", () => {
+  console.log("Cancel clicked");
+});
+
+sendButton.addEventListener("click", () => {
+  console.log("Send clicked");
+});
+      </pre>
+    </section>
+
+    <!-- INPUT BAR -->
+    <footer class="input-bar">
+      <button class="icon">📎</button>
+      <input type="text" placeholder="Start typing..." disabled />
+      <button class="icon">🎤</button>
+      <button class="send">➤</button>
+    </footer>
+
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <h3>History</h3>
+    <ul>
+      <li>Create welcome form</li>
+      <li>Instructions</li>
+      <li>Career tips</li>
+      <li>Onboarding</li>
+    </ul>
+    <button class="clear">Clear history</button>
+  </aside>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
