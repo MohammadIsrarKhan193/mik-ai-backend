@@ -8,40 +8,55 @@
 </head>
 <body>
 
-  <!-- APP WRAPPER -->
-  <div class="app">
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>MÎK AI</h2>
+      <button id="closeSidebar">✕</button>
+    </div>
+
+    <button class="new-chat-btn">➕ New Chat</button>
+
+    <div class="chat-history">
+      <div class="history-item active">Welcome Chat</div>
+      <div class="history-item">AI Ideas</div>
+      <div class="history-item">Learning Plan</div>
+    </div>
+  </aside>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- MAIN -->
+  <div class="main">
 
     <!-- HEADER -->
     <header class="topbar">
-      <button class="menu-btn">☰</button>
+      <button class="menu-btn" id="openSidebar">☰</button>
       <h1>MÎK AI</h1>
       <button class="profile-btn">👤</button>
     </header>
 
-    <!-- CHAT AREA -->
+    <!-- CHAT -->
     <main class="chat-area" id="chatArea">
       <div class="bubble ai">
         👋 Hi, I’m <strong>MÎK AI</strong>.  
-        How can I help you today?
+        Let’s build something great.
       </div>
     </main>
 
-    <!-- INPUT AREA -->
+    <!-- INPUT -->
     <footer class="input-bar">
       <button class="icon-btn" id="voiceBtn">🎤</button>
-
-      <input
-        type="text"
-        id="userInput"
-        placeholder="Ask MÎK AI..."
-        autocomplete="off"
-      />
-
+      <input id="userInput" placeholder="Ask MÎK AI..." />
       <button class="send-btn" id="sendBtn">➤</button>
     </footer>
 
   </div>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
