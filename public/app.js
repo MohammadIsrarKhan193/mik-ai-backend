@@ -9,6 +9,45 @@ const sendBtn = document.getElementById("send-btn");
 const newChatBtn = document.getElementById("new-chat-btn");
 const chatList = document.getElementById("chat-list");
 
+/* ======================
+   Phase 6 – Layout Logic
+====================== */
+
+const sidebar = document.querySelector(".sidebar");
+const menuBtn = document.getElementById("menu-btn");
+
+/* Toggle sidebar (mobile) */
+if (menuBtn) {
+  menuBtn.onclick = () => {
+    sidebar.classList.toggle("open");
+  };
+}
+
+/* Highlight active chat */
+function renderChatList() {
+  chatList.innerHTML = "";
+
+  Object.keys(chats).forEach((id) => {
+    const div = document.createElement("div");
+    div.className = "chat-item";
+    if (id === currentChatId) div.classList.add("active");
+
+    div.textContent = "New chat";
+    div.onclick = () => {
+      currentChatId = id;
+      renderMessages();
+      renderChatList();
+
+      /* Auto close sidebar on mobile */
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove("open");
+      }
+    };
+
+    chatList.appendChild(div);
+  });
+}
+
 /* Chat state */
 let chats = {};
 let currentChatId = null;
