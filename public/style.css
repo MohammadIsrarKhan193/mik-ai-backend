@@ -187,3 +187,72 @@ body {
 .send-btn {
   background: #3b82f6;
 }
+
+/* ======================
+   Phase 6 – Responsive Layout
+====================== */
+
+/* Layout base */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: #0e1117;
+  transition: transform 0.3s ease;
+  z-index: 20;
+}
+
+/* Chat area */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0b0e14;
+}
+
+/* Messages */
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* Input bar fixed */
+.chat-input {
+  position: sticky;
+  bottom: 0;
+  background: #0e1117;
+  padding: 12px;
+}
+
+/* Active chat */
+.chat-item.active {
+  background: #1f6feb;
+  color: #fff;
+}
+
+/* ======================
+   Mobile Behavior
+====================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .chat-area {
+    width: 100%;
+  }
+}
