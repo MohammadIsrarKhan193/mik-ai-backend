@@ -1,79 +1,46 @@
-/* ======================
-   MÎK AI – Phase 5
-   Chat Switching Logic
-====================== */
-
 const chatContainer = document.getElementById("chat-messages");
 const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 const newChatBtn = document.getElementById("new-chat-btn");
 const chatList = document.getElementById("chat-list");
-
-/* ======================
-   Phase 6 – Layout Logic
-====================== */
-
 const sidebar = document.querySelector(".sidebar");
 const menuBtn = document.getElementById("menu-btn");
-
-/* Toggle sidebar (mobile) */
-if (menuBtn) {
-  menuBtn.onclick = () => {
-    sidebar.classList.toggle("open");
-  };
-}
-
-/* Highlight active chat */
-function renderChatList() {
-  chatList.innerHTML = "";
-
-  Object.keys(chats).forEach((id) => {
-    const div = document.createElement("div");
-    div.className = "chat-item";
-    if (id === currentChatId) div.classList.add("active");
-
-    div.textContent = "New chat";
-    div.onclick = () => {
-      currentChatId = id;
-      renderMessages();
-      renderChatList();
-
-      /* Auto close sidebar on mobile */
-      if (window.innerWidth <= 768) {
-        sidebar.classList.remove("open");
-      }
-    };
-
-    chatList.appendChild(div);
-  });
-}
 
 /* Chat state */
 let chats = {};
 let currentChatId = null;
+
+/* Sidebar toggle (mobile) */
+menuBtn.onclick = () => {
+  sidebar.classList.toggle("open");
+};
 
 /* Create new chat */
 function createNewChat() {
   const id = "chat_" + Date.now();
   chats[id] = [];
   currentChatId = id;
-
   renderChatList();
   renderMessages();
 }
 
-/* Render sidebar chat list */
+/* Render chat list */
 function renderChatList() {
   chatList.innerHTML = "";
 
-  Object.keys(chats).forEach((id) => {
+  Object.keys(chats).forEach(id => {
     const div = document.createElement("div");
     div.className = "chat-item";
+    if (id === currentChatId) div.classList.add("active");
     div.textContent = "New chat";
+
     div.onclick = () => {
       currentChatId = id;
+      renderChatList();
       renderMessages();
+      if (window.innerWidth < 769) sidebar.classList.remove("open");
     };
+
     chatList.appendChild(div);
   });
 }
@@ -81,12 +48,11 @@ function renderChatList() {
 /* Render messages */
 function renderMessages() {
   chatContainer.innerHTML = "";
-
   if (!currentChatId) return;
 
   chats[currentChatId].forEach(msg => {
     const bubble = document.createElement("div");
-    bubble.className = msg.role === "user" ? "msg user" : "msg ai";
+    bubble.className = `bubble ${msg.role}`;
     bubble.textContent = msg.text;
     chatContainer.appendChild(bubble);
   });
@@ -103,7 +69,6 @@ function sendMessage() {
   input.value = "";
   renderMessages();
 
-  /* Placeholder AI reply */
   setTimeout(() => {
     chats[currentChatId].push({
       role: "ai",
