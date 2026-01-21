@@ -1,1 +1,163 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
 
+body {
+  background: #b3aacd;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  background: #1e1f25;
+  color: #fff;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #15161c;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.logo {
+  font-size: 20px;
+  margin-bottom: 30px;
+}
+
+.menu button {
+  background: none;
+  border: none;
+  color: #ccc;
+  text-align: left;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.menu .active {
+  background: #2b2d3a;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.pro-card {
+  margin-top: auto;
+  background: linear-gradient(135deg, #7b5cff, #9f7cff);
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.pro-card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #1a1b22;
+  gap: 15px;
+}
+
+.topbar input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+.top-icons span {
+  cursor: pointer;
+}
+
+/* WORKSPACE */
+.workspace {
+  flex: 1;
+  padding: 20px;
+}
+
+.editor-tabs button {
+  background: none;
+  border: none;
+  color: #ccc;
+  margin-right: 10px;
+}
+
+.editor-tabs .active {
+  color: #7b5cff;
+}
+
+.code-box {
+  margin-top: 15px;
+  background: #121317;
+  padding: 20px;
+  border-radius: 10px;
+  overflow: auto;
+}
+
+/* INPUT BAR */
+.input-bar {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background: #1a1b22;
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.icon, .send {
+  background: #2b2d3a;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 260px;
+  background: #15161c;
+  padding: 20px;
+}
+
+.right-panel ul {
+  margin-top: 15px;
+  list-style: none;
+}
+
+.right-panel li {
+  padding: 8px 0;
+  color: #ccc;
+}
+
+.clear {
+  margin-top: 20px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+}
