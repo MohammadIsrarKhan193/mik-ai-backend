@@ -1,67 +1,79 @@
+/* =========================
+   ELEMENTS
+========================= */
 const chat = document.getElementById("chat");
 const input = document.getElementById("msgInput");
 const sendBtn = document.getElementById("sendBtn");
 const voiceBtn = document.getElementById("voiceBtn");
 
-/* ===============================
-   CHAT BUBBLE FUNCTION
-================================ */
-function addMessage(text, type) {
-  const bubble = document.createElement("div");
-  bubble.className = `bubble ${type}`;
-  bubble.innerText = text;
-  chat.appendChild(bubble);
-  chat.scrollTop = chat.scrollHeight;
+/* =========================
+   VOICE (TEXT → SPEECH)
+========================= */
+let voiceEnabled = true;
+const synth = window.speechSynthesis;
+
+voiceBtn.onclick = () => {
+  voiceEnabled = !voiceEnabled;
+  voiceBtn.textContent = voiceEnabled ? "🎤" : "🔇";
+};
+
+function speak(text) {
+  if (!voiceEnabled || !synth) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 1;
+  utter.pitch = 1;
+  synth.cancel();
+  synth.speak(utter);
 }
 
-/* ===============================
-   SEND TEXT → AI
-================================ */
-sendBtn.onclick = async () => {
+/* =========================
+   CHAT BUBBLES
+========================= */
+function addMessage(text, type) {
+  const bubble = document.createElement("div");
+  bubble.className = `msg ${type}`;
+  bubble.textContent = text;
+
+  chat.appendChild(bubble);
+  chat.scrollTop = chat.scrollHeight;
+
+  if (type === "ai") speak(text);
+}
+
+/* =========================
+   SEND MESSAGE → BACKEND
+========================= */
+async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
+
+  // remove welcome screen (if exists)
+  document.getElementById("welcome")?.remove();
 
   addMessage(text, "user");
   input.value = "";
 
-  const thinking = document.createElement("div");
-  thinking.className = "bubble ai";
-  thinking.innerText = "Thinking…";
-  chat.appendChild(thinking);
-  chat.scrollTop = chat.scrollHeight;
-
   try {
-    const res = await fetch("https://mik-ai-backend.onrender.com/chat", {
+    const res = await fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
-    thinking.innerText = data.reply;
+    addMessage(data.reply || "No response 😢", "ai");
+
   } catch (err) {
-    thinking.innerText = "Brain overload 😵 Try again.";
+    addMessage("Brain overload 😵 Try again.", "ai");
   }
-};
+}
 
-/* ===============================
-   VOICE INPUT (NO AI LOGIC HERE)
-================================ */
-voiceBtn.onclick = () => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+/* =========================
+   EVENTS
+========================= */
+sendBtn.onclick = sendMessage;
 
-  if (!SpeechRecognition) {
-    alert("Voice not supported");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.start();
-
-  recognition.onresult = (e) => {
-    const text = e.results[0][0].transcript;
-    input.value = text;
-  };
-};
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
