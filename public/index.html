@@ -2,82 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MÎK AI</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="app">
+  <!-- APP WRAPPER -->
+  <div class="app">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="logo">✨ MÎK AI</div>
-
-    <nav class="menu">
-      <button class="active">AI Chat Helper</button>
-      <button>Templates</button>
-      <button>My Projects</button>
-      <button>Statistics</button>
-      <button>Settings</button>
-    </nav>
-
-    <div class="pro-card">
-      <p>Pro Plan</p>
-      <span>$10 / mo</span>
-      <button>Get PRO</button>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- TOP HEADER -->
+    <!-- HEADER -->
     <header class="topbar">
-      <h1>MÎK AI chat helper</h1>
-      <input type="search" placeholder="Search..." />
-      <div class="top-icons">
-        <span>🔔</span>
-        <span>👤</span>
-      </div>
+      <button class="menu-btn">☰</button>
+      <h1>MÎK AI</h1>
+      <button class="profile-btn">👤</button>
     </header>
 
     <!-- CHAT AREA -->
-    <section class="chat-area" id="chat">
+    <main class="chat-area" id="chatArea">
       <div class="bubble ai">
-        👋 Hello Mohammad Israr — I’m MÎK AI.  
-        This is Phase 2 UI chat.
+        👋 Hi, I’m <strong>MÎK AI</strong>.  
+        How can I help you today?
       </div>
+    </main>
 
-      <div class="bubble user">
-        This looks professional 😍
-      </div>
-    </section>
-
-    <!-- INPUT BAR -->
+    <!-- INPUT AREA -->
     <footer class="input-bar">
-      <button class="icon">📎</button>
-      <input type="text" placeholder="Start typing..." disabled />
-      <button class="icon">🎤</button>
-      <button class="send">➤</button>
+      <button class="icon-btn" id="voiceBtn">🎤</button>
+
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Ask MÎK AI..."
+        autocomplete="off"
+      />
+
+      <button class="send-btn" id="sendBtn">➤</button>
     </footer>
 
-  </main>
+  </div>
 
-  <!-- RIGHT PANEL -->
-  <aside class="right-panel">
-    <h3>History</h3>
-    <ul>
-      <li>Create welcome form</li>
-      <li>Instructions</li>
-      <li>Career tips</li>
-      <li>Onboarding</li>
-    </ul>
-    <button class="clear">Clear history</button>
-  </aside>
-
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
