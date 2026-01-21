@@ -1,4 +1,8 @@
-// PHASE 1
-// UI ONLY — NO AI — NO BACKEND — NO MEMORY
+// PHASE 2
+// Chat UI only — no AI — no backend
 
-console.log("MÎK AI UI Phase 1 loaded successfully");
+const chat = document.getElementById("chat");
+
+chat.scrollTop = chat.scrollHeight;
+
+console.log("MÎK AI Phase 2 chat UI loaded");
