@@ -11,50 +11,50 @@
 <div class="app">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
     <div class="sidebar-header">
       <h2>MÎK AI</h2>
-      <button id="closeSidebar">✕</button>
+      <button id="close-sidebar">✕</button>
     </div>
 
-    <button class="new-chat-btn">➕ New Chat</button>
-
-    <div class="chat-history">
-      <div class="history-item active">Welcome Chat</div>
-      <div class="history-item">AI Ideas</div>
-      <div class="history-item">Learning Plan</div>
-    </div>
+    <button id="new-chat-btn" class="new-chat-btn">＋ New Chat</button>
+    <div id="chat-list" class="chat-history"></div>
   </aside>
 
-  <!-- OVERLAY -->
   <div class="overlay" id="overlay"></div>
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <!-- HEADER -->
+    <!-- TOP BAR -->
     <header class="topbar">
-      <button class="menu-btn" id="openSidebar">☰</button>
+      <button id="menu-btn" class="menu-btn">☰</button>
       <h1>MÎK AI</h1>
       <button class="profile-btn">👤</button>
     </header>
 
     <!-- CHAT -->
-    <main class="chat-area" id="chatArea">
-      <div class="bubble ai">
-        👋 Hi, I’m <strong>MÎK AI</strong>.  
-        Let’s build something great.
-      </div>
-    </main>
+    <section id="chat-messages" class="chat-area">
+      <div class="bubble ai">👋 Hi, I’m <b>MÎK AI</b>. Let’s build something great.</div>
+    </section>
 
     <!-- INPUT -->
     <footer class="input-bar">
-      <button class="icon-btn" id="voiceBtn">🎤</button>
-      <input id="userInput" placeholder="Ask MÎK AI..." />
-      <button class="send-btn" id="sendBtn">➤</button>
+
+      <!-- VOICE TOGGLE (YOUR STYLE) -->
+      <div id="voice-toggle" class="voice-toggle">
+        <span class="mic-icon">🎤</span>
+        <div class="voice-wave">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <input id="user-input" type="text" placeholder="Ask MÎK AI..." />
+
+      <button id="send-btn" class="send-btn">➤</button>
     </footer>
 
-  </div>
+  </main>
 </div>
 
 <script src="app.js"></script>
