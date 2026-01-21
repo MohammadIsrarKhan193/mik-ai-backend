@@ -27,7 +27,6 @@ function createNewChat() {
 /* Render chat list */
 function renderChatList() {
   chatList.innerHTML = "";
-
   Object.keys(chats).forEach(id => {
     const div = document.createElement("div");
     div.className = "chat-item";
@@ -60,22 +59,41 @@ function renderMessages() {
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-/* Send message */
-function sendMessage() {
+/* Send message to backend (Phase 7) */
+async function sendMessage() {
   const text = input.value.trim();
   if (!text || !currentChatId) return;
 
+  // Add user message
   chats[currentChatId].push({ role: "user", text });
   input.value = "";
   renderMessages();
 
-  setTimeout(() => {
+  try {
+    // Call your Render backend
+    const res = await fetch("https://mik-ai-backend.onrender.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, chatId: currentChatId })
+    });
+
+    const data = await res.json();
+
+    // Add AI reply
     chats[currentChatId].push({
       role: "ai",
-      text: "🧠 MÎK AI will respond here (AI next phase)"
+      text: data.reply || "🧠 No response from MÎK AI"
+    });
+
+    renderMessages();
+  } catch (err) {
+    chats[currentChatId].push({
+      role: "ai",
+      text: "⚠️ Brain overload 😵 Try again."
     });
     renderMessages();
-  }, 600);
+    console.error(err);
+  }
 }
 
 /* Events */
