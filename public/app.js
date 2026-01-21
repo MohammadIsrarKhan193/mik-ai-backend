@@ -1,68 +1,24 @@
-const chatContainer = document.getElementById("chat-messages");
+const chatArea = document.querySelector(".chat-area");
 const input = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
-const newChatBtn = document.getElementById("new-chat-btn");
-const chatList = document.getElementById("chat-list");
-const sidebar = document.querySelector(".sidebar");
-const menuBtn = document.getElementById("menu-btn");
+const micBtn = document.getElementById("mic-btn");
 
-/* Sidebar toggle (mobile) */
-menuBtn.onclick = () => sidebar.classList.toggle("open");
-
-/* Chat state */
-let chats = {};
-let currentChatId = null;
-
-/* Create new chat */
-function createNewChat() {
-  const id = "chat_" + Date.now();
-  chats[id] = [];
-  currentChatId = id;
-  renderChatList();
-  renderMessages();
-}
-
-/* Render sidebar chats */
-function renderChatList() {
-  chatList.innerHTML = "";
-  Object.keys(chats).forEach(id => {
-    const div = document.createElement("div");
-    div.className = "chat-item";
-    if (id === currentChatId) div.classList.add("active");
-    div.textContent = "New chat";
-    div.onclick = () => {
-      currentChatId = id;
-      renderChatList();
-      renderMessages();
-      if (window.innerWidth <= 768) sidebar.classList.remove("open");
-    };
-    chatList.appendChild(div);
-  });
-}
-
-/* Render messages */
-function renderMessages() {
-  chatContainer.innerHTML = "";
-  if (!currentChatId) return;
-
-  chats[currentChatId].forEach(msg => {
-    const bubble = document.createElement("div");
-    bubble.className = `bubble ${msg.role}`;
-    bubble.textContent = msg.text;
-    chatContainer.appendChild(bubble);
-  });
-
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+/* Add message bubble */
+function addMessage(text, role) {
+  const div = document.createElement("div");
+  div.className = `bubble ${role}`;
+  div.textContent = text;
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
 }
 
 /* Send message */
 async function sendMessage() {
   const text = input.value.trim();
-  if (!text || !currentChatId) return;
+  if (!text) return;
 
-  chats[currentChatId].push({ role: "user", text });
+  addMessage(text, "user");
   input.value = "";
-  renderMessages();
 
   try {
     const res = await fetch("/chat", {
@@ -72,19 +28,9 @@ async function sendMessage() {
     });
 
     const data = await res.json();
-
-    chats[currentChatId].push({
-      role: "ai",
-      text: data.reply
-    });
-
-    renderMessages();
-  } catch {
-    chats[currentChatId].push({
-      role: "ai",
-      text: "⚠️ Network error. Try again."
-    });
-    renderMessages();
+    addMessage(data.reply, "ai");
+  } catch (err) {
+    addMessage("🤖 MÎK AI couldn’t think properly. Try again.", "ai");
   }
 }
 
@@ -93,7 +39,8 @@ sendBtn.onclick = sendMessage;
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") sendMessage();
 });
-newChatBtn.onclick = createNewChat;
 
-/* Init */
-createNewChat();
+/* Voice UI (visual only, safe) */
+micBtn.onclick = () => {
+  micBtn.classList.toggle("listening");
+};
