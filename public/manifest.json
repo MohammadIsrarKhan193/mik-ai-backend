@@ -1,0 +1,16 @@
+{
+  "name": "MÎK AI Brand Helper",
+  "short_name": "MÎK AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0e",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/10550/10550537.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
