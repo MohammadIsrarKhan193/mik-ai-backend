@@ -1,60 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MÎK AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MÎK AI - Brand</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h2>MÎK AI</h2>
-      <button id="close-sidebar">✕</button>
-    </div>
-
-    <button id="new-chat-btn" class="new-chat-btn">＋ New Chat</button>
-    <div id="chat-list" class="chat-history"></div>
-  </aside>
-
-  <div class="overlay" id="overlay"></div>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <button id="menu-btn" class="menu-btn">☰</button>
-      <h1>MÎK AI</h1>
-      <button class="profile-btn">👤</button>
-    </header>
-
-    <!-- CHAT -->
-    <section id="chat-messages" class="chat-area">
-      <div class="bubble ai">👋 Hi, I’m <b>MÎK AI</b>. Let’s build something great.</div>
-    </section>
-
-    <!-- INPUT -->
-    <footer class="input-bar">
-
-      <!-- VOICE TOGGLE (YOUR STYLE) -->
-      <div id="voice-toggle" class="voice-toggle">
-        <span class="mic-icon">🎤</span>
-        <div class="voice-wave">
-          <span></span><span></span><span></span>
+<div class="app-wrapper">
+    <nav class="nav-sidebar">
+        <div class="logo-area">
+            <div class="brand-logo"><i class="fas fa-sparkles"></i> MÎK AI</div>
         </div>
-      </div>
+        <div class="nav-links">
+            <a href="#" class="active"><i class="fas fa-comment-dots"></i> AI Chat Helper</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Templates <span class="badge">Pro</span></a>
+            <a href="#"><i class="fas fa-th-large"></i> My projects <span class="badge">Pro</span></a>
+            <a href="#"><i class="fas fa-chart-line"></i> Statistics <span class="badge">Pro</span></a>
+            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+        </div>
+        <div class="pro-card">
+            <h3>Pro Plan</h3>
+            <p>Strengthen artificial intelligence: get plan!</p>
+            <div class="price">$10 / mo</div>
+            <button class="btn-pro">Get PRO</button>
+        </div>
+        <div class="user-footer">
+            <i class="fas fa-sign-out-alt"></i> Log out
+        </div>
+    </nav>
 
-      <input id="user-input" type="text" placeholder="Ask MÎK AI..." />
+    <main class="main-content">
+        <header class="chat-header">
+            <h2>MÎK AI chat helper</h2>
+            <div class="header-tools">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-info-circle"></i>
+            </div>
+        </header>
 
-      <button id="send-btn" class="send-btn">➤</button>
-    </footer>
+        <div id="chat-flow">
+            </div>
 
-  </main>
+        <div class="input-container">
+            <div class="input-actions">
+                <i class="fas fa-paperclip"></i>
+                <i class="fas fa-microphone"></i>
+            </div>
+            <input type="text" id="userInput" placeholder="Start typing...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </main>
+
+    <aside class="history-sidebar">
+        <div class="history-header">
+            <h3>History</h3>
+            <span>6/50</span>
+        </div>
+        <div class="history-list" id="historyList">
+            </div>
+        <button class="btn-clear"><i class="fas fa-trash"></i> Clear history</button>
+    </aside>
 </div>
 
 <script src="app.js"></script>
