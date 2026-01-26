@@ -54,3 +54,57 @@ pre {
 }
 
 code { font-family: 'Consolas', monospace; color: #a29bfe; }
+
+/* Fix for the chat container to allow scrolling */
+#chat-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+/* User Bubble */
+.message-bubble.user {
+    align-self: flex-end;
+    background: #2b2b35;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 15px 15px 2px 15px;
+    border: 1px solid #3a3a45;
+}
+
+/* AI Bubble */
+.message-bubble.ai {
+    align-self: flex-start;
+    display: flex;
+    gap: 12px;
+}
+
+.ai-avatar {
+    background: var(--accent);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.message-bubble.ai .content {
+    background: transparent;
+    color: #e0e0e0;
+    max-width: 85%;
+}
+
+/* Markdown Code Blocks styling */
+pre {
+    background: #000 !important;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+code { color: #a29bfe; }
