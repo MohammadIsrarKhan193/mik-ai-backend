@@ -3,87 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MÎK AI — Brand Dashboard</title>
+    <title>MÎK AI - Brand Helper</title>
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-
 <div class="app-wrapper">
     <nav class="nav-sidebar">
-        <div class="logo-area">
-            <div class="brand-logo"><i class="fas fa-bolt"></i> MÎK AI</div>
-        </div>
+        <div class="brand-logo"><i class="fas fa-bolt"></i> MÎK AI</div>
         <div class="nav-links">
             <a href="#" class="active"><i class="fas fa-comment-dots"></i> AI Chat Helper</a>
-            <a href="#"><i class="fas fa-file-code"></i> Templates <span class="badge">Pro</span></a>
-            <a href="#"><i class="fas fa-folder"></i> My projects <span class="badge">Pro</span></a>
-            <a href="#"><i class="fas fa-chart-pie"></i> Statistics <span class="badge">Pro</span></a>
-            <a href="#"><i class="fas fa-sliders-h"></i> Settings</a>
+            <a href="#"><i class="fas fa-file-code"></i> Templates</a>
+            <a href="#"><i class="fas fa-folder"></i> Projects</a>
         </div>
         <div class="pro-card">
-            <div class="close-pro">×</div>
             <h3>Pro Plan</h3>
-            <p>Strengthen artificial intelligence: get plan!</p>
-            <div class="price">$10 / mo</div>
+            <p>Upgrade for unlimited speed!</p>
             <button class="btn-pro">Get PRO</button>
-        </div>
-        <div class="user-footer" onclick="location.reload()">
-            <i class="fas fa-sign-out-alt"></i> Log out
         </div>
     </nav>
 
     <main class="main-content">
         <header class="chat-header">
-            <div class="header-title">
-                <h2>MÎK AI chat helper</h2>
-            </div>
-            <div class="header-tools">
-                <i class="fas fa-search"></i>
-                <i class="fas fa-bell"></i>
-                <i class="fas fa-info-circle"></i>
-            </div>
+            <h2>MÎK AI chat helper</h2>
+            <div class="header-tools"><i class="fas fa-bell"></i><i class="fas fa-cog"></i></div>
         </header>
 
         <div id="chat-flow">
             <div class="ai-intro">
-                <h1>Hello, Mohammad Israr</h1>
-                <p>What can MÎK build for you today?</p>
+                <h1>Welcome, Israr Jani</h1>
+                <p>What can I solve for you today?</p>
             </div>
         </div>
 
         <div class="input-area-wrapper">
             <div class="input-container">
-                <div class="input-actions">
-                    <i class="fas fa-paperclip"></i>
-                    <i class="fas fa-microphone" id="voiceBtn"></i>
-                </div>
-                <input type="text" id="userInput" placeholder="Start typing your request...">
+                <i class="fas fa-paperclip"></i>
+                <input type="text" id="userInput" placeholder="Ask MÎK AI anything...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
-            <p class="disclaimer">Free Research Preview. MÎK AI may produce inaccurate information.</p>
         </div>
     </main>
-
-    <aside class="history-sidebar">
-        <div class="history-header">
-            <h3>History</h3>
-            <span class="count">6/50</span>
-        </div>
-        <div class="history-list" id="historyList">
-            <div class="history-item active">
-                <div class="h-icon"><i class="far fa-comment"></i></div>
-                <div class="h-text">
-                    <strong>Create welcome form</strong>
-                    <p>Write code (HTML, CSS...)</p>
-                </div>
-            </div>
-        </div>
-        <button class="btn-clear" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Clear history</button>
-    </aside>
 </div>
-
 <script src="app.js"></script>
 </body>
 </html>
