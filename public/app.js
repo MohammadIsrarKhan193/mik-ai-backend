@@ -2,33 +2,27 @@ const chatFlow = document.getElementById("chat-flow");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
-// 🧠 v11.0 Profile Memory
-let myId = localStorage.getItem("mik_user_id");
-if (!myId) {
-    myId = prompt("Enter your Brand Profile ID:") || "Mohammad Israr";
-    localStorage.setItem("mik_user_id", myId);
-}
+// 🧠 Get User Identity
+let myId = localStorage.getItem("mik_user_id") || "Mohammad Israr";
 
-// 🔊 Voice Settings
-let voiceEnabled = true;
+// 🔊 Voice Setup
 const synth = window.speechSynthesis;
-
 function speak(text) {
-    if (!voiceEnabled || !synth) return;
-    const cleanText = text.replace(/<[^>]*>?/gm, ''); // Remove HTML tags
-    const utter = new SpeechSynthesisUtterance(cleanText);
+    if (!synth) return;
     synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text.replace(/[*#`]/g, ''));
     synth.speak(utter);
 }
 
-// 💬 Add Brand Message Bubbles
+// 💬 Add Brand Bubbles
 function addMsg(text, type) {
     const div = document.createElement("div");
     div.className = `message-bubble ${type}`;
     
     if (type === "ai") {
-        // Formats code like your design
-        div.innerHTML = `<div class="ai-avatar">✨</div><div class="content">${marked.parse(text)}</div>`;
+        // Uses marked to render code blocks like your design
+        const formattedText = typeof marked !== 'undefined' ? marked.parse(text) : text;
+        div.innerHTML = `<div class="ai-avatar">✨</div><div class="content">${formattedText}</div>`;
         speak(text);
     } else {
         div.innerHTML = `<div class="content">${text}</div>`;
@@ -38,38 +32,47 @@ function addMsg(text, type) {
     chatFlow.scrollTop = chatFlow.scrollHeight;
 }
 
-// 🚀 Send Message to Render Backend
+// 🚀 The Logic to get Real Answers
 async function send() {
-    const message = userInput.value.trim();
-    if (!message) return;
+    const msg = userInput.value.trim();
+    if (!msg) return;
 
-    // Clear intro on first message
+    // Remove the "Hello" intro on first message
     const intro = document.querySelector(".ai-intro");
     if (intro) intro.remove();
 
-    addMsg(message, "user");
+    addMsg(msg, "user");
     userInput.value = "";
 
+    // Show a small loading indicator
+    const loading = document.createElement("div");
+    loading.className = "message-bubble ai loading";
+    loading.innerHTML = `<div class="ai-avatar">✨</div><div class="content">MÎK AI is thinking...</div>`;
+    chatFlow.appendChild(loading);
+
     try {
-        const res = await fetch("/chat", {
+        const response = await fetch("/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message, userId: myId })
+            body: JSON.stringify({ 
+                message: msg, 
+                userId: myId 
+            })
         });
-        const data = await res.json();
-        addMsg(data.reply || "MÎK AI is updating...", "ai");
-    } catch (err) {
-        addMsg("Connection issue. Please check your Render server!", "ai");
-    }
-}
 
-function clearAll() {
-    if(confirm("Jani, clear all memory?")) {
-        chatFlow.innerHTML = "";
-        localStorage.removeItem("mik_user_id");
-        location.reload();
+        const data = await response.json();
+        loading.remove();
+
+        if (data.reply) {
+            addMsg(data.reply, "ai");
+        } else {
+            addMsg("I'm having trouble connecting to my brain. Check Render logs, Jani!", "ai");
+        }
+    } catch (err) {
+        loading.remove();
+        addMsg("Connection error. Is the Render server awake?", "ai");
     }
 }
 
 sendBtn.onclick = send;
-userInput.onkeydown = (e) => { if(e.key === "Enter") send(); };
+userInput.onkeydown = (e) => { if (e.key === "Enter") send(); };
