@@ -1,8 +1,10 @@
-const express = require("express");
-const Groq = require("groq-sdk");
-const cors = require("cors");
-const { addMemory, getMemory } = require("./memory");
-require("dotenv").config();
+import express from "express";
+import Groq from "groq-sdk";
+import cors from "cors";
+import { addMemory, getMemory } from "./memory.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -18,30 +20,36 @@ app.post("/chat", async (req, res) => {
 
     if (!message) return res.status(400).json({ reply: "Empty message." });
 
-    const memory = getMemory(id);
-    addMemory(id, "user", message);
+    // 1. Get previous chat history
+    const history = getMemory(id);
 
+    // 2. Call the AI
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         { 
           role: "system", 
-          content: `You are MÎK AI Helper, a world-class expert assistant created by Mohammad Israr. 
-          Respond with clear, helpful, and professional answers. Use Markdown for code blocks.` 
+          content: `You are MÎK AI Helper, a world-class executive assistant created by Mohammad Israr Khan (MÎK). 
+          You are witty, helpful, and you call the user 'Jani'. Use Markdown for code.` 
         },
-        ...memory,
+        ...history,
         { role: "user", content: message }
       ]
     });
 
     const reply = completion.choices[0].message.content;
+
+    // 3. Save this conversation to memory
+    addMemory(id, "user", message);
     addMemory(id, "assistant", reply);
+
     res.json({ reply });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ reply: "⚠️ MÎK AI is recalibrating. Please try again." });
+    console.error("MÎK Error:", error);
+    res.status(500).json({ reply: "⚠️ MÎK AI is recalibrating. Check your API Key, Jani!" });
   }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("🚀 MÎK AI Brand Online"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 MÎK Brand Online at http://localhost:${PORT}`));
