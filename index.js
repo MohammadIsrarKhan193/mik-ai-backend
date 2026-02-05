@@ -21,7 +21,7 @@ app.post("/chat", async (req, res) => {
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
-        { role: "system", content: "You are MÎK AI, a professional brand assistant created by Mohammad Israr. Use Markdown for all code blocks." },
+        { role: "system", content: "You are MÎK AI, a world-class assistant. Answer professionally using Markdown for code." },
         ...memory,
         { role: "user", content: message }
       ]
@@ -31,8 +31,8 @@ app.post("/chat", async (req, res) => {
     addMemory(id, "assistant", reply);
     res.json({ reply });
   } catch (error) {
-    res.status(500).json({ reply: "⚠️ Connection lost. Try again, Jani!" });
+    res.status(500).json({ reply: "⚠️ AI is busy. Try again!" });
   }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("🚀 MÎK AI Online"));
+app.listen(process.env.PORT || 3000, () => console.log("🚀 MÎK AI ONLINE"));
