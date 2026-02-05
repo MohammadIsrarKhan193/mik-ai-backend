@@ -3,47 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MÎK AI - Brand Helper</title>
-    <link rel="manifest" href="/manifest.json">
+    <title>MÎK AI</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
-    <nav class="nav-sidebar">
-        <div class="brand-logo"><i class="fas fa-bolt"></i> MÎK AI</div>
-        <div class="nav-links">
-            <a href="#" class="active"><i class="fas fa-comment-dots"></i> AI Chat Helper</a>
-            <a href="#"><i class="fas fa-file-code"></i> Templates</a>
-            <a href="#"><i class="fas fa-folder"></i> Projects</a>
+    <nav class="sidebar">
+        <div class="logo">MÎK AI</div>
+        <div class="links">
+            <div class="link active"><i class="fas fa-comment"></i> AI Helper</div>
+            <div class="link"><i class="fas fa-code"></i> Templates</div>
         </div>
         <div class="pro-card">
-            <h3>Pro Plan</h3>
-            <p>Upgrade for unlimited speed!</p>
-            <button class="btn-pro">Get PRO</button>
+            <p>Upgrade to Pro</p>
+            <button>Get Plan</button>
         </div>
     </nav>
-
-    <main class="main-content">
-        <header class="chat-header">
-            <h2>MÎK AI chat helper</h2>
-            <div class="header-tools"><i class="fas fa-bell"></i><i class="fas fa-cog"></i></div>
-        </header>
-
+    <main class="chat-area">
         <div id="chat-flow">
-            <div class="ai-intro">
-                <h1>Welcome, Israr Jani</h1>
-                <p>What can I solve for you today?</p>
-            </div>
+            <div class="intro"><h1>Hi, Israr Jani</h1><p>What can I build for you today?</p></div>
         </div>
-
-        <div class="input-area-wrapper">
-            <div class="input-container">
-                <i class="fas fa-paperclip"></i>
-                <input type="text" id="userInput" placeholder="Ask MÎK AI anything...">
-                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
+        <div class="input-box">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </main>
 </div>
