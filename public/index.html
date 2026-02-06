@@ -2,48 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MÎK AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MÎK AI - Mohammad Israr</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <div class="brand-wrapper">
-        <aside class="sidebar">
-            <div class="logo">⚡ MÎK AI</div>
-            <nav>
-                <div class="nav-item active"><i class="fas fa-comment"></i> Chat Helper</div>
-                <div class="nav-item"><i class="fas fa-code"></i> Templates</div>
-                <div class="nav-item"><i class="fas fa-folder"></i> Projects</div>
-            </nav>
-            <div class="pro-box">
-                <p>Pro Plan</p>
-                <button>Get PRO</button>
-            </div>
-        </aside>
+<div class="app-wrapper">
+    <nav class="sidebar">
+        <div class="brand-header">
+            <img src="logo.png" class="brand-logo" alt="MÎK AI">
+            <span>MÎK AI</span>
+        </div>
+        
+        <div class="nav-links">
+            <div class="link active"><i class="fas fa-robot"></i> AI Helper</div>
+            <div class="link"><i class="fas fa- brain"></i> Creator Lab</div>
+        </div>
 
-        <main class="chat-container">
-            <header>
-                <h2>MÎK AI chat helper</h2>
-                <div class="header-icons"><i class="fas fa-bell"></i> <i class="fas fa-cog"></i></div>
-            </header>
-            
-            <div id="chat-flow">
-                <div class="welcome">
-                    <h1>Welcome, Israr Jani</h1>
-                    <p>What can I solve for you today?</p>
-                </div>
-            </div>
+        <div class="about-card">
+            <h3>About MÎK AI</h3>
+            <p>A premium AI Brand developed by <strong>Mohammad Israr</strong>. Designed for speed, intelligence, and a helper mindset.</p>
+            <div class="creator-badge">V1.0 Stable</div>
+        </div>
 
-            <div class="input-area">
-                <div class="bar">
-                    <input type="text" id="userInput" placeholder="Start typing...">
-                    <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
+        <div class="pro-card">
+            <p>Unlock V18.0 Brain</p>
+            <button class="btn-pro">Upgrade</button>
+        </div>
+    </nav>
+
+    <main class="chat-main">
+        <div id="chat-flow">
+            <div class="welcome-screen">
+                <h1>Welcome, Israr Jani</h1>
+                <p>MÎK AI is ready. What are we building today?</p>
             </div>
-        </main>
-    </div>
-    <script src="app.js"></script>
+        </div>
+
+        <div class="input-container">
+            <div class="input-bar">
+                <input type="text" id="userInput" placeholder="Start typing your request...">
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="app.js"></script>
 </body>
 </html>
