@@ -16,7 +16,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 .brand-header { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: bold; }
 .brand-logo { width: 35px; height: 35px; border-radius: 8px; }
 
-.nav-links { display: flex; flex-direction: column; gap: 15px; } /* Professional Spacing */
+.nav-links { display: flex; flex-direction: column; gap: 15px; }
 .link { color: var(--dim); padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
 .link.active { background: #2d2d39; color: white; }
 
@@ -31,7 +31,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 
 /* BUBBLES */
 .msg { max-width: 80%; padding: 15px; border-radius: 15px; line-height: 1.6; }
-.msg.user { align-self: flex-end; background: #2b2b35; border-bottom-right-radius: 2px; }
+.msg.user { align-self: flex-ends; background: #2b2b35; border-bottom-right-radius: 2px; }
 .msg.ai { align-self: flex-start; display: flex; gap: 15px; background: transparent; }
 .ai-ico { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 10px var(--accent); }
 
@@ -44,6 +44,28 @@ input#userInput { flex: 1; background: transparent; border: none; color: white; 
 #sendBtn { background: var(--accent); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; }
 
 .disclaimer { font-size: 10px; color: var(--dim); text-align: center; margin-top: 10px; }
+
+/* 🎨 GENERATED IMAGE STYLING */
+.gen-img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+}
+
+.dl-btn {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid var(--accent);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
 
 /* MOBILE FIX */
 @media (max-width: 800px) { .sidebar { display: none; } .input-container { padding: 15px; } }
