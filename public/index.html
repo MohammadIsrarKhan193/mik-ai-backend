@@ -3,70 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; img-src * data:; default-src * 'unsafe-inline' 'unsafe-eval';">
-
     <title>MÎK AI - Mohammad Israr</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
-    <nav class="sidebar">
-        <div class="brand-header">
-            <img src="logo.png" class="brand-logo" alt="MÎK AI Logo">
-            <span>MÎK AI</span>
+    <header class="modern-header">
+        <div class="menu-btn"><i class="fas fa-bars"></i></div>
+        <div class="mode-toggle">
+            <button class="toggle-btn active" id="askMode"><i class="fas fa-comment"></i> Ask</button>
+            <button class="toggle-btn" id="imagineMode"><i class="fas fa-wand-magic-sparkles"></i> Imagine</button>
         </div>
-        
-        <div class="nav-links">
-            <div class="link active"><i class="fas fa-comment-dots"></i> AI Chat Helper</div>
-            <div class="link"><i class="fas fa-magic"></i> Image Creator</div>
-            <div class="link"><i class="fas fa-microphone"></i> Voice Mode</div>
-        </div>
-
-        <div class="about-card">
-            <h3>Creator</h3>
-            <p>Designed and Built by <strong>Mohammad Israr</strong>.</p>
-            <div class="creator-badge">MÎK Brand v1.0</div>
-        </div>
-
-        <div class="pro-card">
-            <p>Unlock Pro Features</p>
-            <button class="btn-pro">Get Plan</button>
-        </div>
-    </nav>
+        <div class="profile-btn"><i class="fas fa-edit"></i></div>
+    </header>
 
     <main class="chat-main">
-        <header class="top-bar">
-            <h2>MÎK AI chat helper</h2>
-            <div class="top-icons">
-                <i class="fas fa-search"></i>
-                <i class="fas fa-bell"></i>
-                <i class="fas fa-cog"></i>
-            </div>
-        </header>
-
         <div id="chat-flow">
             <div class="welcome-screen">
                 <h1>Welcome, Israr Jani</h1>
-                <p>MÎK AI is ready. What can I build for you today?</p>
+                <p>MÎK AI is ready. What are we building today?</p>
             </div>
         </div>
 
         <div class="input-container">
             <div class="input-bar">
-                <label for="fileInput" class="icon-btn"><i class="fas fa-paperclip"></i></label>
-                <input type="file" id="fileInput" style="display:none;">
-                
+                <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
                 <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
-                
-                <input type="text" id="userInput" placeholder="Start typing your request...">
-                
+                <input type="text" id="userInput" placeholder="Ask MÎK AI anything...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
-            <p class="disclaimer">MÎK AI may produce inaccurate information. Created by Israr.</p>
+            <p class="disclaimer">Created by Israr • MÎK AI Premium</p>
         </div>
     </main>
 </div>
