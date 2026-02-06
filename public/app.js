@@ -7,21 +7,19 @@ function addMsg(text, type) {
     const div = document.createElement("div");
     div.className = `msg ${type}`;
     
-    // Check if the reply is an image
     if (text.startsWith("IMAGE_GEN:")) {
         const url = text.replace("IMAGE_GEN:", "");
         div.innerHTML = `<div class="ai-ico"></div>
                          <div class="txt">
                             <p>Here is your creation, Jani:</p>
-                            <img src="${url}" class="gen-img" alt="MÎK AI Art">
-                            <br><a href="${url}" download="MIK_AI_Art.png" class="dl-btn">Download Image</a>
+                            <img src="${url}" class="gen-img" onerror="this.src='https://via.placeholder.com/400?text=Image+Loading...'" alt="MÎK AI Art">
+                            <br><a href="${url}" target="_blank" class="dl-btn">Open Full Image</a>
                          </div>`;
     } else {
         div.innerHTML = type === "ai" 
             ? `<div class="ai-ico"></div><div class="txt">${marked.parse(text)}</div>` 
             : text;
     }
-    
     chatFlow.appendChild(div);
     chatFlow.scrollTop = chatFlow.scrollHeight;
 }
@@ -42,24 +40,39 @@ async function send() {
         const data = await res.json();
         addMsg(data.reply, "ai");
     } catch { 
-        addMsg("Error connecting to MÎK AI.", "ai"); 
+        addMsg("MÎK AI is having trouble. Check your Render logs!", "ai"); 
     }
 }
 
 sendBtn.onclick = send;
 userInput.onkeydown = (e) => e.key === "Enter" && send();
 
-// 🎙️ VOICE BRAIN
+// 🎙️ IMPROVED VOICE BRAIN
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
     voiceBtn.addEventListener('click', () => {
-        recognition.start();
-        voiceBtn.style.color = "#ff4757";
+        try {
+            recognition.start();
+            voiceBtn.style.color = "#ff4757";
+            userInput.placeholder = "Listening...";
+        } catch (e) {
+            recognition.stop();
+        }
     });
+
     recognition.onresult = (event) => {
-        userInput.value = event.results[0][0].transcript;
+        const result = event.results[0][0].transcript;
+        userInput.value = result;
         voiceBtn.style.color = "";
-        send();
+        userInput.placeholder = "Start typing...";
+        send(); // This sends the spoken text automatically
+    };
+
+    recognition.onend = () => {
+        voiceBtn.style.color = "";
     };
 }
