@@ -1,48 +1,65 @@
-const express = require("express");
-const Groq = require("groq-sdk");
-const cors = require("cors");
-require("dotenv").config();
+const chatFlow = document.getElementById("chat-flow");
+const userInput = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const voiceBtn = document.getElementById("voiceBtn");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static("public"));
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-let chatHistory = {};
-
-app.post("/chat", async (req, res) => {
-  try {
-    const { message, userId } = req.body;
-    const id = userId || "Mohammad Israr";
-    const prompt = message.toLowerCase();
-
-    // 🎨 IMAGE GENERATION LOGIC
-    if (prompt.includes("create") || prompt.includes("generate") || prompt.includes("draw") || prompt.includes("pic")) {
-      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(message)}?width=512&height=512&seed=${Math.floor(Math.random() * 1000)}&nologo=true`;
-      return res.json({ reply: `IMAGE_GEN:${imageUrl}` });
+function addMsg(text, type) {
+    const div = document.createElement("div");
+    div.className = `msg ${type}`;
+    
+    // Check if the reply is an image
+    if (text.startsWith("IMAGE_GEN:")) {
+        const url = text.replace("IMAGE_GEN:", "");
+        div.innerHTML = `<div class="ai-ico"></div>
+                         <div class="txt">
+                            <p>Here is your creation, Jani:</p>
+                            <img src="${url}" class="gen-img" alt="MÎK AI Art">
+                            <br><a href="${url}" download="MIK_AI_Art.png" class="dl-btn">Download Image</a>
+                         </div>`;
+    } else {
+        div.innerHTML = type === "ai" 
+            ? `<div class="ai-ico"></div><div class="txt">${marked.parse(text)}</div>` 
+            : text;
     }
+    
+    chatFlow.appendChild(div);
+    chatFlow.scrollTop = chatFlow.scrollHeight;
+}
 
-    // 💬 TEXT LOGIC
-    if (!chatHistory[id]) chatHistory[id] = [];
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: "You are MÎK AI, a professional assistant created by Mohammad Israr." },
-        ...chatHistory[id],
-        { role: "user", content: message }
-      ]
+async function send() {
+    const val = userInput.value.trim();
+    if (!val) return;
+    document.querySelector(".welcome-screen")?.remove();
+    addMsg(val, "user");
+    userInput.value = "";
+
+    try {
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: val, userId: "Israr" })
+        });
+        const data = await res.json();
+        addMsg(data.reply, "ai");
+    } catch { 
+        addMsg("Error connecting to MÎK AI.", "ai"); 
+    }
+}
+
+sendBtn.onclick = send;
+userInput.onkeydown = (e) => e.key === "Enter" && send();
+
+// 🎙️ VOICE BRAIN
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    voiceBtn.addEventListener('click', () => {
+        recognition.start();
+        voiceBtn.style.color = "#ff4757";
     });
-
-    const reply = completion.choices[0].message.content;
-    chatHistory[id].push({ role: "user", content: message }, { role: "assistant", content: reply });
-    if (chatHistory[id].length > 10) chatHistory[id].shift();
-
-    res.json({ reply });
-  } catch (error) {
-    res.status(500).json({ reply: "MÎK AI is busy. Try again!" });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 MÎK AI Online on ${PORT}`));
+    recognition.onresult = (event) => {
+        userInput.value = event.results[0][0].transcript;
+        voiceBtn.style.color = "";
+        send();
+    };
+}
