@@ -9,39 +9,40 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-// Simple in-memory storage (Resets when server restarts on Free Tier)
 let chatHistory = {};
 
 app.post("/chat", async (req, res) => {
   try {
     const { message, userId } = req.body;
     const id = userId || "Mohammad Israr";
+    const prompt = message.toLowerCase();
 
+    // 🎨 IMAGE GENERATION LOGIC
+    if (prompt.includes("create") || prompt.includes("generate") || prompt.includes("draw") || prompt.includes("pic")) {
+      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(message)}?width=512&height=512&seed=${Math.floor(Math.random() * 1000)}&nologo=true`;
+      return res.json({ reply: `IMAGE_GEN:${imageUrl}` });
+    }
+
+    // 💬 TEXT LOGIC
     if (!chatHistory[id]) chatHistory[id] = [];
-    
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
-        { role: "system", content: "You are MÎK AI, a professional assistant created by Mohammad Israr. Use Markdown." },
+        { role: "system", content: "You are MÎK AI, a professional assistant created by Mohammad Israr." },
         ...chatHistory[id],
         { role: "user", content: message }
       ]
     });
 
     const reply = completion.choices[0].message.content;
-    
-    // Save to history
-    chatHistory[id].push({ role: "user", content: message });
-    chatHistory[id].push({ role: "assistant", content: reply });
+    chatHistory[id].push({ role: "user", content: message }, { role: "assistant", content: reply });
     if (chatHistory[id].length > 10) chatHistory[id].shift();
 
     res.json({ reply });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ reply: "MÎK AI is having a brain freeze. Check your GROQ_API_KEY!" });
+    res.status(500).json({ reply: "MÎK AI is busy. Try again!" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 MÎK AI Online on ${PORT}`));
