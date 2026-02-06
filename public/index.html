@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MÎK AI - Mohammad Israr</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>MÎK AI - The Premium Assistant by Mohammad Israr</title>
+    <meta name="description" content="MÎK AI is a world-class AI brand developed by Mohammad Israr. Experience speed, intelligence, and professional assistance.">
+    <meta name="keywords" content="MÎK AI, Mohammad Israr, AI Assistant, Israr AI, Smart Chat">
+    <meta name="author" content="Mohammad Israr">
+    
+    <meta property="og:title" content="MÎK AI - Mohammad Israr">
+    <meta property="og:description" content="The future of AI branding is here. Built by Israr.">
+    <meta property="og:image" content="logo.png">
+
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,40 +22,57 @@
 <div class="app-wrapper">
     <nav class="sidebar">
         <div class="brand-header">
-            <img src="logo.png" class="brand-logo" alt="MÎK AI">
+            <img src="logo.png" class="brand-logo" alt="MÎK AI Logo">
             <span>MÎK AI</span>
         </div>
         
         <div class="nav-links">
-            <div class="link active"><i class="fas fa-robot"></i> AI Helper</div>
-            <div class="link"><i class="fas fa- brain"></i> Creator Lab</div>
+            <div class="link active"><i class="fas fa-comment-dots"></i> AI Chat Helper</div>
+            <div class="link"><i class="fas fa-magic"></i> Image Creator</div>
+            <div class="link"><i class="fas fa-microphone"></i> Voice Mode</div>
         </div>
 
         <div class="about-card">
-            <h3>About MÎK AI</h3>
-            <p>A premium AI Brand developed by <strong>Mohammad Israr</strong>. Designed for speed, intelligence, and a helper mindset.</p>
-            <div class="creator-badge">V1.0 Stable</div>
+            <h3>Creator</h3>
+            <p>Designed and Built by <strong>Mohammad Israr</strong>.</p>
+            <div class="creator-badge">MÎK Brand v1.0</div>
         </div>
 
         <div class="pro-card">
-            <p>Unlock V18.0 Brain</p>
-            <button class="btn-pro">Upgrade</button>
+            <p>Unlock Pro Features</p>
+            <button class="btn-pro">Get Plan</button>
         </div>
     </nav>
 
     <main class="chat-main">
+        <header class="top-bar">
+            <h2>MÎK AI chat helper</h2>
+            <div class="top-icons">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-cog"></i>
+            </div>
+        </header>
+
         <div id="chat-flow">
             <div class="welcome-screen">
                 <h1>Welcome, Israr Jani</h1>
-                <p>MÎK AI is ready. What are we building today?</p>
+                <p>MÎK AI is ready. What can I build for you today?</p>
             </div>
         </div>
 
         <div class="input-container">
             <div class="input-bar">
+                <label for="fileInput" class="icon-btn"><i class="fas fa-paperclip"></i></label>
+                <input type="file" id="fileInput" style="display:none;">
+                
+                <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
+                
                 <input type="text" id="userInput" placeholder="Start typing your request...">
+                
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
+            <p class="disclaimer">MÎK AI may produce inaccurate information. Created by Israr.</p>
         </div>
     </main>
 </div>
