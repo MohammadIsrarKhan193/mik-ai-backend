@@ -13,15 +13,28 @@ document.getElementById('sidebarClose').onclick = () => mainSidebar.classList.re
 // NEW CHAT
 document.getElementById('newChatBtn').onclick = () => {
     if(confirm("Start a fresh chat, Jani?")) {
-        chatFlow.innerHTML = `<div class="welcome-screen"><h1>Welcome, Israr Jani</h1><p>MÎK AI is ready.</p></div>`;
+        chatFlow.innerHTML = `
+            <div class="welcome-screen">
+                <div class="big-logo">MÎK</div>
+                <h1>Welcome, Israr Jani</h1>
+                <p>MÎK AI is ready. Let's create something great.</p>
+            </div>`;
         mainSidebar.classList.remove('open');
         window.speechSynthesis.cancel();
     }
 };
 
 // --- 🔘 ASK/IMAGINE TOGGLE ---
-askMode.onclick = () => { askMode.classList.add('active'); imagineMode.classList.remove('active'); userInput.placeholder = "Message MÎK AI..."; };
-imagineMode.onclick = () => { imagineMode.classList.add('active'); askMode.classList.remove('active'); userInput.placeholder = "Describe what to Imagine..."; };
+askMode.onclick = () => { 
+    askMode.classList.add('active'); 
+    imagineMode.classList.remove('active'); 
+    userInput.placeholder = "Message MÎK AI..."; 
+};
+imagineMode.onclick = () => { 
+    imagineMode.classList.add('active'); 
+    askMode.classList.remove('active'); 
+    userInput.placeholder = "Describe what to Imagine..."; 
+};
 
 // --- 🔊 VOICE REPLY ---
 function speak(text) {
@@ -36,8 +49,8 @@ function addMsg(text, type) {
     div.className = `msg ${type}`;
     if (text.startsWith("IMAGE_GEN:")) {
         const url = text.replace("IMAGE_GEN:", "");
-        div.innerHTML = `<div class="ai-ico"></div><div class="txt"><img src="${url}" class="gen-img"></div>`;
-        speak("I imagined this for you.");
+        div.innerHTML = `<div class="ai-ico"></div><div class="txt"><img src="${url}" class="gen-img" style="width:100%; border-radius:12px;"></div>`;
+        speak("Here is your image, Jani.");
     } else {
         div.innerHTML = type === "ai" ? `<div class="ai-ico"></div><div class="txt">${marked.parse(text)}</div>` : text;
         if (type === "ai") speak(text);
@@ -54,10 +67,16 @@ async function send() {
     addMsg(val, "user");
     userInput.value = "";
     try {
-        const res = await fetch("/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: val, userId: "Israr" }) });
+        const res = await fetch("/chat", { 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ message: val, userId: "Israr" }) 
+        });
         const data = await res.json();
         addMsg(data.reply, "ai");
-    } catch { addMsg("Error connecting.", "ai"); }
+    } catch { 
+        addMsg("Connection error, Jani.", "ai"); 
+    }
 }
 
 sendBtn.onclick = send;
