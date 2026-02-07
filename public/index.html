@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; img-src * data:; default-src * 'unsafe-inline' 'unsafe-eval';">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob:; connect-src *;">
     <title>MÎK AI - Mohammad Israr</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -20,24 +20,18 @@
         <div class="profile-btn" id="galleryToggle"><i class="fas fa-images"></i></div>
     </header>
 
-    <aside id="historySidebar" class="side-panel">
-        <h3>Chat History</h3>
+    <aside id="historySidebar" class="side-panel left">
+        <div class="panel-header"><h3>History</h3><i class="fas fa-times close-panel"></i></div>
         <div id="historyList"></div>
     </aside>
 
-    <aside id="gallerySidebar" class="side-panel">
-        <h3>Your Imaginations</h3>
+    <aside id="gallerySidebar" class="side-panel right">
+        <div class="panel-header"><h3>Gallery</h3><i class="fas fa-times close-panel"></i></div>
         <div id="galleryGrid" class="gallery-grid"></div>
     </aside>
 
     <main class="chat-main">
-        <div id="chat-flow">
-            <div class="welcome-screen">
-                <h1>Welcome, Israr Jani</h1>
-                <p>MÎK AI is ready. Switch to "Imagine" to draw or "Ask" to chat.</p>
-            </div>
-        </div>
-
+        <div id="chat-flow"></div>
         <div class="input-container">
             <div class="input-bar">
                 <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
