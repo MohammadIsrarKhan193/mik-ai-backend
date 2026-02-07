@@ -4,38 +4,45 @@ body.light-theme { --bg: #f5f5f7; --panel: #ffffff; --text: #1d1d1f; --dim: #868
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
 
-/* FIXING THE HEADER */
-.modern-header {
-    position: fixed; top: 0; width: 100%; height: 70px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; background: var(--bg); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
+/* SIDEBAR DESIGN */
+.sidebar {
+    position: fixed; left: -300px; top: 0; height: 100%; width: 280px;
+    background: var(--panel); z-index: 2000; transition: 0.3s;
+    display: flex; flex-direction: column; padding: 20px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+.sidebar.open { left: 0; }
+.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.brand img { width: 30px; border-radius: 5px; }
+
+/* NEW CHAT BUTTON */
+.new-chat-btn {
+    background: #2d2d39; color: white; border: 1px solid #3d3d4d;
+    padding: 12px; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 25px;
 }
 
-.mode-toggle { background: rgba(255,255,255,0.05); padding: 4px; border-radius: 30px; display: flex; }
-.toggle-btn { padding: 6px 15px; border-radius: 25px; border: none; background: transparent; color: var(--dim); cursor: pointer; font-size: 14px; }
+.sidebar-nav { flex: 1; }
+.nav-item { padding: 12px; border-radius: 10px; color: var(--dim); cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 5px; }
+.nav-item.active, .nav-item:hover { background: rgba(108, 92, 231, 0.1); color: var(--accent); }
+.nav-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 20px 0; }
+
+/* HEADER & CHAT */
+.modern-header { position: fixed; top: 0; width: 100%; height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 1000; background: var(--bg); }
+.mode-toggle { background: #1c1c24; padding: 4px; border-radius: 20px; display: flex; border: 1px solid #2d2d39; }
+.toggle-btn { padding: 5px 15px; border-radius: 15px; border: none; background: transparent; color: var(--dim); cursor: pointer; font-size: 13px; }
 .toggle-btn.active { background: #2d2d39; color: white; }
 
-/* FIXING THE "UGLY" SIDEBARS */
-.side-panel {
-    position: fixed; top: 0; height: 100%; width: 280px;
-    background: var(--panel); z-index: 2000; padding: 20px;
-    transition: 0.3s ease; visibility: hidden; /* Start Hidden */
-}
-.side-panel.left { left: -280px; }
-.side-panel.right { right: -280px; }
-.side-panel.open { visibility: visible; }
-.side-panel.left.open { transform: translateX(280px); }
-.side-panel.right.open { transform: translateX(-280px); }
+#chat-flow { height: 100vh; padding: 80px 15px 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+.msg { max-width: 85%; padding: 15px; border-radius: 18px; line-height: 1.5; font-size: 15px; }
+.msg.user { align-self: flex-end; background: #2d2d39; }
+.msg.ai { align-self: flex-start; display: flex; gap: 10px; }
+.ai-ico { width: 30px; height: 30px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
 
-/* CHAT AREA */
-#chat-flow { height: 100vh; padding: 80px 15px 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+/* INPUT BAR */
+.input-container { position: fixed; bottom: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, var(--bg) 30%); }
+.input-bar { background: #1c1c24; border-radius: 30px; padding: 8px 18px; display: flex; align-items: center; gap: 10px; border: 1px solid #2d2d39; }
+input#userInput { flex: 1; background: transparent; border: none; color: white; outline: none; height: 40px; }
+#sendBtn { background: var(--accent); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
 
-/* 🔘 SHARE BUTTON STYLE */
-.image-actions { display: flex; gap: 10px; margin-top: 10px; }
-.action-link { 
-    background: var(--accent); color: white; padding: 8px 12px; 
-    border-radius: 8px; text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 5px;
-}
-.share-btn { background: #444; }
-
-.gen-img { width: 100%; border-radius: 12px; border: 1px solid var(--accent); }
+.gen-img { width: 100%; border-radius: 12px; border: 1px solid var(--accent); margin-top: 10px; }
