@@ -11,58 +11,59 @@
 </head>
 <body class="dark-theme">
 <div class="app-wrapper">
+    <aside id="mainSidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand"><img src="logo.png" alt="Logo"> MÎK AI</div>
+            <i class="fas fa-times close-sidebar" id="sidebarClose"></i>
+        </div>
+
+        <button class="new-chat-btn" id="newChatBtn">
+            <i class="fas fa-plus"></i> New Chat
+        </button>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item active" id="showChat"><i class="fas fa-comment"></i> Chat</div>
+            <div class="nav-item" id="showGallery"><i class="fas fa-images"></i> Gallery</div>
+            <div class="nav-item" id="showHistory"><i class="fas fa-history"></i> History</div>
+            <div class="nav-divider"></div>
+            <div class="nav-item" id="showSettings"><i class="fas fa-cog"></i> Settings</div>
+        </nav>
+
+        <div class="creator-footer">
+            <p>Created by <strong>Mohammad Israr</strong></p>
+        </div>
+    </aside>
+
     <header class="modern-header">
-        <div class="menu-btn" id="historyToggle"><i class="fas fa-history"></i></div>
+        <div class="menu-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
         <div class="mode-toggle">
-            <button class="toggle-btn active" id="askMode"><i class="fas fa-comment"></i> Ask</button>
-            <button class="toggle-btn" id="imagineMode"><i class="fas fa-wand-magic-sparkles"></i> Imagine</button>
+            <button class="toggle-btn active" id="askMode">Ask</button>
+            <button class="toggle-btn" id="imagineMode">Imagine</button>
         </div>
-        <div class="right-actions">
-            <div class="action-btn" id="newChatBtn"><i class="fas fa-edit"></i></div>
-            <div class="action-btn" id="settingsToggle"><i class="fas fa-cog"></i></div>
-        </div>
+        <div class="profile-btn"><i class="fas fa-user-circle"></i></div>
     </header>
-
-    <aside id="historySidebar" class="side-panel left">
-        <div class="panel-header"><h3>History</h3><i class="fas fa-times close-panel"></i></div>
-        <div id="historyList"></div>
-    </aside>
-
-    <aside id="gallerySidebar" class="side-panel right">
-        <div class="panel-header"><h3>Gallery</h3><i class="fas fa-times close-panel"></i></div>
-        <div id="galleryGrid" class="gallery-grid"></div>
-    </aside>
-
-    <aside id="settingsSidebar" class="side-panel right">
-        <div class="panel-header"><h3>Settings</h3><i class="fas fa-times close-panel"></i></div>
-        <div class="setting-item">
-            <span>Light Mode</span>
-            <label class="switch">
-                <input type="checkbox" id="themeToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item" id="openGallery">
-            <span>View All Images</span>
-            <i class="fas fa-chevron-right"></i>
-        </div>
-    </aside>
 
     <main class="chat-main">
         <div id="chat-flow">
             <div class="welcome-screen">
                 <h1>Welcome, Israr Jani</h1>
-                <p>MÎK AI is ready. What are we building today?</p>
+                <p>Everything you need is in the sidebar. Ready to create?</p>
             </div>
         </div>
+
+        <div id="galleryView" class="sub-view" style="display:none;">
+            <h3>Your Imaginations</h3>
+            <div id="galleryGrid" class="gallery-grid"></div>
+            <button class="back-btn">Back to Chat</button>
+        </div>
+
         <div class="input-container">
             <div class="input-bar">
                 <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
                 <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
-                <input type="text" id="userInput" placeholder="Ask MÎK AI anything...">
+                <input type="text" id="userInput" placeholder="Message MÎK AI...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
-            <p class="disclaimer">Created by Israr • MÎK AI Premium</p>
         </div>
     </main>
 </div>
