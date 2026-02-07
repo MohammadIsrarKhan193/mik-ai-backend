@@ -12,19 +12,29 @@
 <body>
 <div class="app-wrapper">
     <header class="modern-header">
-        <div class="menu-btn"><i class="fas fa-bars"></i></div>
+        <div class="menu-btn" id="historyToggle"><i class="fas fa-history"></i></div>
         <div class="mode-toggle">
             <button class="toggle-btn active" id="askMode"><i class="fas fa-comment"></i> Ask</button>
             <button class="toggle-btn" id="imagineMode"><i class="fas fa-wand-magic-sparkles"></i> Imagine</button>
         </div>
-        <div class="profile-btn"><i class="fas fa-edit"></i></div>
+        <div class="profile-btn" id="galleryToggle"><i class="fas fa-images"></i></div>
     </header>
+
+    <aside id="historySidebar" class="side-panel">
+        <h3>Chat History</h3>
+        <div id="historyList"></div>
+    </aside>
+
+    <aside id="gallerySidebar" class="side-panel">
+        <h3>Your Imaginations</h3>
+        <div id="galleryGrid" class="gallery-grid"></div>
+    </aside>
 
     <main class="chat-main">
         <div id="chat-flow">
             <div class="welcome-screen">
                 <h1>Welcome, Israr Jani</h1>
-                <p>MÎK AI is ready. What are we building today?</p>
+                <p>MÎK AI is ready. Switch to "Imagine" to draw or "Ask" to chat.</p>
             </div>
         </div>
 
