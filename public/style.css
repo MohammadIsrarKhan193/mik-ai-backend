@@ -1,35 +1,41 @@
-:root { 
-    --bg: #0b0b0e; --panel: #16161b; --accent: #6c5ce7; --text: #ffffff; --dim: #94949e; 
+:root { --bg: #0b0b0e; --panel: #16161b; --accent: #6c5ce7; --text: #ffffff; --dim: #94949e; }
+body.light-theme { --bg: #f5f5f7; --panel: #ffffff; --text: #1d1d1f; --dim: #86868b; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; }
+
+/* FIXING THE HEADER */
+.modern-header {
+    position: fixed; top: 0; width: 100%; height: 70px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; background: var(--bg); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* 🌞 LIGHT THEME OVERRIDES */
-body.light-theme {
-    --bg: #f5f5f7; --panel: #ffffff; --text: #1d1d1f; --dim: #86868b;
+.mode-toggle { background: rgba(255,255,255,0.05); padding: 4px; border-radius: 30px; display: flex; }
+.toggle-btn { padding: 6px 15px; border-radius: 25px; border: none; background: transparent; color: var(--dim); cursor: pointer; font-size: 14px; }
+.toggle-btn.active { background: #2d2d39; color: white; }
+
+/* FIXING THE "UGLY" SIDEBARS */
+.side-panel {
+    position: fixed; top: 0; height: 100%; width: 280px;
+    background: var(--panel); z-index: 2000; padding: 20px;
+    transition: 0.3s ease; visibility: hidden; /* Start Hidden */
 }
+.side-panel.left { left: -280px; }
+.side-panel.right { right: -280px; }
+.side-panel.open { visibility: visible; }
+.side-panel.left.open { transform: translateX(280px); }
+.side-panel.right.open { transform: translateX(-280px); }
 
-/* ... keep your other CSS and add these ... */
+/* CHAT AREA */
+#chat-flow { height: 100vh; padding: 80px 15px 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
-.right-actions { display: flex; gap: 15px; }
-.action-btn { font-size: 1.2rem; cursor: pointer; color: var(--text); }
-
-/* THEME SWITCH */
-.setting-item { 
-    display: flex; justify-content: space-between; align-items: center; 
-    padding: 15px 0; border-bottom: 1px solid #2d2d39; 
+/* 🔘 SHARE BUTTON STYLE */
+.image-actions { display: flex; gap: 10px; margin-top: 10px; }
+.action-link { 
+    background: var(--accent); color: white; padding: 8px 12px; 
+    border-radius: 8px; text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 5px;
 }
+.share-btn { background: #444; }
 
-.switch { position: relative; display: inline-block; width: 45px; height: 24px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { 
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; 
-    background-color: #333; transition: .4s; border-radius: 34px; 
-}
-.slider:before { 
-    position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; 
-    background-color: white; transition: .4s; border-radius: 50%; 
-}
-input:checked + .slider { background-color: var(--accent); }
-input:checked + .slider:before { transform: translateX(21px); }
-
-/* Images fix */
-.gen-img { width: 100%; border-radius: 12px; margin: 10px 0; display: block; background: #222; min-height: 200px; }
+.gen-img { width: 100%; border-radius: 12px; border: 1px solid var(--accent); }
