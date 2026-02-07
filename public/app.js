@@ -1,3 +1,4 @@
+// --- SELECTORS ---
 const chatFlow = document.getElementById("chat-flow");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -8,21 +9,36 @@ const galleryGrid = document.getElementById('galleryGrid');
 const themeToggle = document.getElementById('themeToggle');
 const newChatBtn = document.getElementById('newChatBtn');
 
-// 🌓 DARK/LIGHT MODE LOGIC
+// --- 🔊 VOICE REPLY (TEXT-TO-SPEECH) ---
+let isVoiceEnabled = true; // You can turn this off in settings later if you want
+
+function speak(text) {
+    if (!isVoiceEnabled) return;
+    
+    // Clean text for cleaner speech (remove markdown)
+    const cleanText = text.replace(/[#*`_]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0; 
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+}
+
+// --- 🌓 DARK/LIGHT MODE ---
 themeToggle.onchange = () => {
     document.body.classList.toggle('light-theme');
     localStorage.setItem('mik_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 };
 
-// Load saved theme on start
 if (localStorage.getItem('mik_theme') === 'light') {
     document.body.classList.add('light-theme');
     themeToggle.checked = true;
 }
 
-// 🆕 NEW CHAT LOGIC
+// --- 🆕 NEW CHAT ---
 newChatBtn.onclick = () => {
-    if(confirm("Jani, do you want to start a fresh chat?")) {
+    if(confirm("Jani, clear this chat and start fresh?")) {
+        window.speechSynthesis.cancel(); // Stop talking if starting new chat
         chatFlow.innerHTML = `
             <div class="welcome-screen">
                 <h1>Welcome, Israr Jani</h1>
@@ -31,7 +47,7 @@ newChatBtn.onclick = () => {
     }
 };
 
-// 🔘 MODE SWITCHER
+// --- 🔘 MODE SWITCHER ---
 askMode.onclick = () => {
     askMode.classList.add('active');
     imagineMode.classList.remove('active');
@@ -44,18 +60,42 @@ imagineMode.onclick = () => {
     userInput.placeholder = "Describe what to Imagine...";
 };
 
-// 🏛️ SIDEBAR TOGGLES
-document.getElementById('historyToggle').onclick = () => document.getElementById('historySidebar').classList.toggle('open');
-document.getElementById('galleryToggle').onclick = () => document.getElementById('gallerySidebar').classList.toggle('open');
-document.getElementById('settingsToggle').onclick = () => document.getElementById('settingsSidebar').classList.toggle('open');
+// --- 🏛️ SIDEBAR LOGIC (Fixes the "Ugly" Overlap) ---
+function closeAllPanels() {
+    document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+}
 
-// Close panels when 'X' is clicked
+document.getElementById('historyToggle').onclick = () => { closeAllPanels(); document.getElementById('historySidebar').classList.toggle('open'); };
+document.getElementById('galleryToggle').onclick = () => { closeAllPanels(); document.getElementById('gallerySidebar').classList.toggle('open'); };
+document.getElementById('settingsToggle').onclick = () => { closeAllPanels(); document.getElementById('settingsSidebar').classList.toggle('open'); };
+document.getElementById('openGallery').onclick = () => { closeAllPanels(); document.getElementById('gallerySidebar').classList.add('open'); };
+
 document.querySelectorAll('.close-panel').forEach(btn => {
-    btn.onclick = () => {
-        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
-    }
+    btn.onclick = closeAllPanels;
 });
 
+// --- 📤 SHARE FUNCTION ---
+async function shareImg(url) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const file = new File([blob], 'MIK-AI-Art.png', { type: blob.type });
+        
+        if (navigator.share) {
+            await navigator.share({
+                files: [file],
+                title: 'MÎK AI Creation',
+                text: 'Jani, check out this art created by MÎK AI! 🎨'
+            });
+        } else {
+            alert("Share not supported. Copy the image link instead!");
+        }
+    } catch (err) {
+        console.error("Share failed", err);
+    }
+}
+
+// --- 💬 MESSAGE LOGIC ---
 function addMsg(text, type) {
     const div = document.createElement("div");
     div.className = `msg ${type}`;
@@ -65,37 +105,41 @@ function addMsg(text, type) {
         div.innerHTML = `
             <div class="ai-ico"></div>
             <div class="txt">
-                <p>Here is your creation, Jani:</p>
-                <img src="${url}" class="gen-img" alt="AI Art">
-                <br><a href="${url}" target="_blank" class="dl-btn">Open Full Quality</a>
+                <p>Jani, I imagined this for you:</p>
+                <img src="${url}" class="gen-img">
+                <div class="image-actions">
+                    <a href="${url}" download class="action-link">📥 Download</a>
+                    <button onclick="shareImg('${url}')" class="action-link share-btn">📤 Share</button>
+                </div>
             </div>`;
-        
-        // Add to Gallery!
-        const gImg = document.createElement('img');
-        gImg.src = url;
+        const gImg = document.createElement('img'); gImg.src = url;
         galleryGrid.prepend(gImg);
+        speak("Here is your creation, Jani.");
     } else {
         div.innerHTML = type === "ai" 
             ? `<div class="ai-ico"></div><div class="txt">${marked.parse(text)}</div>` 
             : text;
+        
+        if (type === "ai") speak(text);
     }
     
     chatFlow.appendChild(div);
     chatFlow.scrollTop = chatFlow.scrollHeight;
 }
 
+// --- 🚀 SEND LOGIC ---
 async function send() {
     let val = userInput.value.trim();
     if (!val) return;
 
-    // Auto-Imagine logic
     if (imagineMode.classList.contains('active') && !val.toLowerCase().includes('create')) {
-        val = "Create a " + val;
+        val = "Create " + val;
     }
 
     document.querySelector(".welcome-screen")?.remove();
     addMsg(val, "user");
     userInput.value = "";
+    window.speechSynthesis.cancel(); // Stop talking if user sends a new message
 
     try {
         const res = await fetch("/chat", {
@@ -106,14 +150,14 @@ async function send() {
         const data = await res.json();
         addMsg(data.reply, "ai");
     } catch { 
-        addMsg("MÎK AI connection error. Check Render!", "ai"); 
+        addMsg("Connection error, Jani. Check your Render logs.", "ai"); 
     }
 }
 
 sendBtn.onclick = send;
 userInput.onkeydown = (e) => e.key === "Enter" && send();
 
-// 🎙️ VOICE BRAIN
+// --- 🎙️ VOICE INPUT ---
 const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
@@ -125,7 +169,5 @@ if (SpeechRecognition) {
         userInput.value = e.results[0][0].transcript; 
         send(); 
     };
-    recognition.onend = () => { 
-        voiceBtn.style.color = ""; 
-    };
+    recognition.onend = () => { voiceBtn.style.color = ""; };
 }
