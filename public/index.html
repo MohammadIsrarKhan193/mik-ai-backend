@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,15 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body>
-<div class="app-wrapper">
+<body class="dark-theme"> <div class="app-wrapper">
     <header class="modern-header">
         <div class="menu-btn" id="historyToggle"><i class="fas fa-history"></i></div>
         <div class="mode-toggle">
             <button class="toggle-btn active" id="askMode"><i class="fas fa-comment"></i> Ask</button>
             <button class="toggle-btn" id="imagineMode"><i class="fas fa-wand-magic-sparkles"></i> Imagine</button>
         </div>
-        <div class="profile-btn" id="galleryToggle"><i class="fas fa-images"></i></div>
+        <div class="right-actions">
+            <div class="action-btn" id="newChatBtn"><i class="fas fa-edit"></i></div>
+            <div class="action-btn" id="settingsToggle"><i class="fas fa-cog"></i></div>
+        </div>
     </header>
 
     <aside id="historySidebar" class="side-panel left">
@@ -30,8 +32,28 @@
         <div id="galleryGrid" class="gallery-grid"></div>
     </aside>
 
+    <aside id="settingsSidebar" class="side-panel right">
+        <div class="panel-header"><h3>Settings</h3><i class="fas fa-times close-panel"></i></div>
+        <div class="setting-item">
+            <span>Light Mode</span>
+            <label class="switch">
+                <input type="checkbox" id="themeToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item" id="openGallery">
+            <span>View All Images</span>
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </aside>
+
     <main class="chat-main">
-        <div id="chat-flow"></div>
+        <div id="chat-flow">
+            <div class="welcome-screen">
+                <h1>Welcome, Israr Jani</h1>
+                <p>MÎK AI is ready. What are we building today?</p>
+            </div>
+        </div>
         <div class="input-container">
             <div class="input-bar">
                 <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
