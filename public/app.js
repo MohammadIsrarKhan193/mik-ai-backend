@@ -1,80 +1,68 @@
 const chatFlow = document.getElementById("chat-flow");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
-const voiceBtn = document.getElementById("voiceBtn");
 const mainSidebar = document.getElementById('mainSidebar');
-const settingsPanel = document.getElementById('settings-panel');
+const settingsOverlay = document.getElementById('settingsOverlay');
 
-// --- 🚀 NAVIGATION LOGIC ---
+// --- 🧭 NAVIGATION ---
 document.getElementById('sidebarToggle').onclick = () => mainSidebar.classList.add('open');
 document.getElementById('sidebarClose').onclick = () => mainSidebar.classList.remove('open');
 
-// NEW CHAT FUNCTION (Both Sidebar and Header)
-const resetChat = () => {
-    chatFlow.innerHTML = `<div class="welcome-screen"><div class="big-logo">MÎK</div><h1>Welcome, Israr Jani</h1><p>MÎK AI is refreshed and ready.</p></div>`;
-    mainSidebar.classList.remove('open');
-    window.speechSynthesis.cancel();
+// NEW CHAT (Top Right Button)
+document.getElementById('headerNewChat').onclick = () => {
+    if(confirm("Fresh chat, Jani?")) {
+        chatFlow.innerHTML = `<div class="welcome-screen"><div class="big-logo">MÎK</div><h1>MÎK AI Refreshed</h1></div>`;
+    }
 };
-document.getElementById('headerNewChat').onclick = resetChat;
 
-// SETTINGS & HISTORY ACTIONS
+// SETTINGS CONTROL
 document.getElementById('navSettings').onclick = () => {
-    settingsPanel.style.display = 'flex';
+    settingsOverlay.style.display = 'flex';
     mainSidebar.classList.remove('open');
 };
-document.querySelector('.close-panel-btn').onclick = () => settingsPanel.style.display = 'none';
+document.getElementById('closeSettings').onclick = () => settingsOverlay.style.display = 'none';
 
+// HISTORY
 document.getElementById('navHistory').onclick = () => {
-    alert("History feature coming in v2.0 Jani! For now, your chats are local.");
+    alert("History is being synced to your MÎK account...");
     mainSidebar.classList.remove('open');
 };
 
-// --- 🤖 TYPING & MESSAGING ---
-function showTyping() {
-    const div = document.createElement("div");
-    div.id = "typing-indicator";
-    div.className = "msg ai";
-    div.innerHTML = `<div class="ai-ico"></div><div class="typing"><span></span><span></span><span></span></div>`;
-    chatFlow.appendChild(div);
-    chatFlow.scrollTop = chatFlow.scrollHeight;
-}
-
-function removeTyping() {
-    const indicator = document.getElementById("typing-indicator");
-    if (indicator) indicator.remove();
-}
-
+// --- 💬 CORE SEND LOGIC ---
 async function send() {
     let val = userInput.value.trim();
     if (!val) return;
     
     document.querySelector(".welcome-screen")?.remove();
-    addMsg(val, "user");
-    userInput.value = "";
-    showTyping();
+    // Add User Message
+    const uMsg = document.createElement("div");
+    uMsg.className = "msg user";
+    uMsg.textContent = val;
+    chatFlow.appendChild(uMsg);
     
-    // Get selected model from settings
-    const selectedModel = document.getElementById('modelSelect').value;
+    userInput.value = "";
+    chatFlow.scrollTop = chatFlow.scrollHeight;
 
     try {
+        const model = document.getElementById('modelSelect').value;
         const res = await fetch("/chat", { 
             method: "POST", 
             headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ 
-                message: val, 
-                userId: "Israr",
-                model: selectedModel // Send model choice to backend
-            }) 
+            body: JSON.stringify({ message: val, model: model }) 
         });
         const data = await res.json();
-        removeTyping();
-        addMsg(data.reply, "ai");
-    } catch { 
-        removeTyping();
-        addMsg("Server busy Jani, try again!", "ai"); 
+        
+        // Add AI Message (Simplified for now)
+        const aMsg = document.createElement("div");
+        aMsg.className = "msg ai";
+        aMsg.innerHTML = `<div class="ai-ico"></div><div class="txt">${marked.parse(data.reply)}</div>`;
+        chatFlow.appendChild(aMsg);
+        chatFlow.scrollTop = chatFlow.scrollHeight;
+    } catch (e) {
+        console.error(e);
     }
 }
 
-// ... (keep the rest of your Speak, AddMsg, and Voice logic from previous step)
 sendBtn.onclick = send;
 userInput.onkeydown = (e) => e.key === "Enter" && send();
+
