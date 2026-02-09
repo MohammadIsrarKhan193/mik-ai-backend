@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MÎK AI - Mohammad Israr</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="dark-theme">
@@ -36,25 +37,28 @@
             <button class="toggle-btn active" id="askMode">Ask</button>
             <button class="toggle-btn" id="imagineMode">Imagine</button>
         </div>
-        <div class="profile-btn" id="headerNewChat" title="New Chat"><i class="fas fa-edit"></i></div>
+        <div class="header-action-btn" id="headerNewChat"><i class="far fa-edit"></i></div>
     </header>
 
     <main class="chat-main">
-        <div id="settings-panel" class="overlay-panel">
-            <div class="panel-content">
-                <h3>Settings</h3>
-                <div class="setting-item">
-                    <span>AI Engine</span>
+        <div id="settingsOverlay" class="full-overlay">
+            <div class="overlay-content">
+                <div class="overlay-header">
+                    <h3>Settings</h3>
+                    <i class="fas fa-times" id="closeSettings"></i>
+                </div>
+                <div class="setting-row">
+                    <span>AI Model</span>
                     <select id="modelSelect">
                         <option value="gemini">Google Gemini Pro</option>
                         <option value="gpt4">ChatGPT-4 Turbo</option>
                     </select>
                 </div>
-                <div class="setting-item">
+                <div class="setting-row">
                     <span>Theme</span>
-                    <button id="themeToggle">Switch Mode</button>
+                    <button id="themeToggle" class="mini-btn">Toggle Light/Dark</button>
                 </div>
-                <button class="close-panel-btn">Done</button>
+                <p class="setting-note">MÎK AI automatically optimizes performance.</p>
             </div>
         </div>
 
@@ -68,7 +72,7 @@
 
         <div class="input-container">
             <div class="input-bar">
-                <button class="icon-btn" id="paperclipBtn"><i class="fas fa-paperclip"></i></button>
+                <button class="icon-btn" id="clipBtn"><i class="fas fa-paperclip"></i></button>
                 <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
                 <input type="text" id="userInput" placeholder="Message MÎK AI...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
