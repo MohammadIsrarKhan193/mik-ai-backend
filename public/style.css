@@ -1,8 +1,15 @@
-:root { --bg: #0b0b0e; --panel: #16161b; --accent: #6c5ce7; --text: #ffffff; --dim: #94949e; }
+:root { 
+    --bg: #0b0b0e; 
+    --panel: #16161b; 
+    --accent: #6c5ce7; 
+    --text: #ffffff; 
+    --dim: #94949e; 
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-/* SIDEBAR */
+/* --- SIDEBAR --- */
 .sidebar { position: fixed; left: -300px; top: 0; height: 100%; width: 280px; background: var(--panel); z-index: 2000; transition: 0.3s ease; padding: 20px; border-right: 1px solid rgba(255,255,255,0.05); }
 .sidebar.open { left: 0; }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -14,26 +21,52 @@ body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidde
 .nav-item { padding: 12px; border-radius: 10px; color: var(--dim); cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 5px; transition: 0.2s; }
 .nav-item.active, .nav-item:hover { background: rgba(108, 92, 231, 0.1); color: var(--accent); }
 
-/* HEADER */
+/* --- HEADER --- */
 .modern-header { position: fixed; top: 0; width: 100%; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; background: var(--bg); z-index: 1000; }
 .header-action-btn { color: var(--accent); font-size: 1.2rem; cursor: pointer; }
 .mode-toggle { background: #1c1c24; padding: 4px; border-radius: 20px; display: flex; border: 1px solid #2d2d39; }
 .toggle-btn { padding: 5px 15px; border-radius: 15px; border: none; background: transparent; color: var(--dim); font-size: 12px; cursor: pointer; }
 .toggle-btn.active { background: #2d2d39; color: white; }
 
-/* CHAT FLOW */
-#chat-flow { height: 100vh; padding: 75px 15px 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+/* --- CHAT FLOW & MESSAGES --- */
+#chat-flow { height: 100vh; padding: 75px 15px 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 .welcome-screen { text-align: center; margin-top: 60px; }
 .big-logo { font-size: 3rem; font-weight: 900; color: var(--accent); opacity: 0.5; }
 
-/* INPUT BAR */
+/* Added Message Bubbles for Professional Look */
+.msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 15px; }
+.msg.user { align-self: flex-end; background: #2d2d39; color: white; border-bottom-right-radius: 4px; }
+.msg.ai { align-self: flex-start; background: transparent; display: flex; gap: 10px; padding: 0; }
+.ai-ico { width: 32px; height: 32px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+
+/* --- IMAGE STYLING --- */
+.msg img { 
+    max-width: 100%; 
+    border-radius: 15px; 
+    margin-top: 10px; 
+    border: 2px solid rgba(108, 92, 231, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
+}
+.msg img:hover { transform: scale(1.02); }
+
+/* --- INPUT BAR --- */
 .input-container { position: fixed; bottom: 0; width: 100%; padding: 15px; background: linear-gradient(transparent, var(--bg) 40%); }
 .input-bar { background: #1c1c24; border-radius: 25px; padding: 8px 15px; display: flex; align-items: center; gap: 10px; border: 1px solid #2d2d39; }
 input#userInput { flex: 1; background: transparent; border: none; color: white; outline: none; padding: 10px 0; }
 .icon-btn { background: transparent; border: none; color: var(--dim); cursor: pointer; font-size: 1.1rem; padding: 5px; }
+
+/* FIXED VOICE BUTTON */
+#voiceBtn { 
+    z-index: 10; 
+    position: relative; 
+    cursor: pointer; 
+    padding: 10px; 
+}
+
 #sendBtn { background: var(--accent); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; }
 
-/* SETTINGS OVERLAY */
+/* --- SETTINGS OVERLAY --- */
 .full-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 4000; display: none; align-items: center; justify-content: center; }
 .overlay-content { background: var(--panel); width: 90%; max-width: 380px; padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
 .overlay-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
