@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob:; connect-src *;">
     <title>MÎK AI - Mohammad Israr</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -23,13 +22,10 @@
                 <p>AI Developer</p>
             </div>
         </div>
-        <button class="new-chat-btn" id="newChatBtn"><i class="fas fa-plus"></i> New Chat</button>
         <nav class="sidebar-nav">
-            <div class="nav-item active"><i class="fas fa-comment"></i> Chat</div>
-            <div class="nav-item"><i class="fas fa-images"></i> Gallery</div>
-            <div class="nav-item"><i class="fas fa-history"></i> History</div>
-            <div class="nav-divider"></div>
-            <div class="nav-item"><i class="fas fa-cog"></i> Settings</div>
+            <div class="nav-item active" id="navChat"><i class="fas fa-comment"></i> Chat</div>
+            <div class="nav-item" id="navHistory"><i class="fas fa-history"></i> History</div>
+            <div class="nav-item" id="navSettings"><i class="fas fa-cog"></i> Settings</div>
         </nav>
         <div class="creator-footer"><p>MÎK AI Premium v1.0</p></div>
     </aside>
@@ -40,10 +36,28 @@
             <button class="toggle-btn active" id="askMode">Ask</button>
             <button class="toggle-btn" id="imagineMode">Imagine</button>
         </div>
-        <div class="profile-btn"><i class="fas fa-user-circle"></i></div>
+        <div class="profile-btn" id="headerNewChat" title="New Chat"><i class="fas fa-edit"></i></div>
     </header>
 
     <main class="chat-main">
+        <div id="settings-panel" class="overlay-panel">
+            <div class="panel-content">
+                <h3>Settings</h3>
+                <div class="setting-item">
+                    <span>AI Engine</span>
+                    <select id="modelSelect">
+                        <option value="gemini">Google Gemini Pro</option>
+                        <option value="gpt4">ChatGPT-4 Turbo</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span>Theme</span>
+                    <button id="themeToggle">Switch Mode</button>
+                </div>
+                <button class="close-panel-btn">Done</button>
+            </div>
+        </div>
+
         <div id="chat-flow">
             <div class="welcome-screen">
                 <div class="big-logo">MÎK</div>
@@ -51,9 +65,10 @@
                 <p>Experience the next generation of AI.</p>
             </div>
         </div>
+
         <div class="input-container">
             <div class="input-bar">
-                <button class="icon-btn"><i class="fas fa-paperclip"></i></button>
+                <button class="icon-btn" id="paperclipBtn"><i class="fas fa-paperclip"></i></button>
                 <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
                 <input type="text" id="userInput" placeholder="Message MÎK AI...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
