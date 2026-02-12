@@ -19,7 +19,7 @@ document.getElementById('navSettings').onclick = () => {
 };
 document.getElementById('closeSettings').onclick = () => settingsOverlay.style.display = 'none';
 
-// --- 🎙️ FIXED VOICE LOGIC ---
+// --- 🎙️ VOICE LOGIC ---
 const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
@@ -28,45 +28,57 @@ if (SpeechRecognition) {
 
     voiceBtn.onclick = () => {
         recognition.start();
-        voiceBtn.style.color = "#ff4757"; // Red when listening
+        voiceBtn.style.color = "#ff4757";
     };
 
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        userInput.value = transcript;
-        send(); // Automatically send after speaking
+        userInput.value = event.results[0][0].transcript;
+        send();
     };
 
-    recognition.onend = () => {
-        voiceBtn.style.color = ""; // Back to normal
-    };
+    recognition.onend = () => { voiceBtn.style.color = ""; };
 }
 
-// --- 🖼️ MESSAGE & IMAGE HELPER ---
+// --- 🖼️ SMART MESSAGE & IMAGE HELPER ---
 function addMsg(content, type) {
     const div = document.createElement("div");
     div.className = `msg ${type}`;
     
-    // Check if the content is an image link
-    if (content.includes("https://") && (content.includes("pollinations.ai") || content.includes(".png"))) {
-        div.innerHTML = `
-            <div class="ai-ico"></div>
-            <div class="txt">
-                <img src="${content}" style="width:100%; border-radius:15px; margin-top:10px;" alt="Generated AI Art">
-                <br><a href="${content}" download="MIK_AI_Art.png" class="action-link" style="display:inline-block; margin-top:10px; color:var(--accent); text-decoration:none; font-size:12px;">📥 Download Image</a>
-            </div>`;
+    const imageUrlPattern = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/i;
+    const isImage = imageUrlPattern.test(content);
+
+    if (type === "ai") {
+        let finalContent = marked.parse(content);
+        
+        if (isImage || content.includes("pollinations.ai")) {
+            const url = isImage ? content.match(imageUrlPattern)[0] : content.trim();
+            finalContent = `
+                <div class="ai-image-wrapper">
+                    <img src="${url}" alt="MÎK AI Art" class="generated-img">
+                    <a href="${url}" target="_blank" class="dl-btn"><i class="fas fa-download"></i> Save to Gallery</a>
+                </div>`;
+        }
+        div.innerHTML = `<div class="ai-ico"></div><div class="txt">${finalContent}</div>`;
     } else {
-        div.innerHTML = type === "ai" ? `<div class="ai-ico"></div><div class="txt">${marked.parse(content)}</div>` : content;
+        div.textContent = content;
     }
     
     chatFlow.appendChild(div);
     chatFlow.scrollTop = chatFlow.scrollHeight;
 }
 
-// --- 💬 SEND LOGIC ---
+// --- 💬 SEND LOGIC (With Earn Money Logic) ---
+let messageCount = 0;
 async function send() {
     let val = userInput.value.trim();
     if (!val) return;
+
+    // 💰 Earnings Logic: Every 5 messages, show an Ad alert
+    messageCount++;
+    if (messageCount > 5) {
+        alert("Jani, watch a quick ad to keep chatting for free or Go Premium! 🚀");
+        messageCount = 0; 
+    }
     
     document.querySelector(".welcome-screen")?.remove();
     addMsg(val, "user");
@@ -82,10 +94,9 @@ async function send() {
         const data = await res.json();
         addMsg(data.reply, "ai");
     } catch (e) {
-        addMsg("Connection lost, Jani. Check your internet!", "ai");
+        addMsg("Connection lost, Jani. Check internet!", "ai");
     }
 }
 
 sendBtn.onclick = send;
 userInput.onkeydown = (e) => e.key === "Enter" && send();
-
