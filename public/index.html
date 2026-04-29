@@ -1,85 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MÎK AI - Mohammad Israr</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MÎK AI 🪐</title>
+  <meta name="description" content="MÎK AI — Cosmic Intelligence by Mohammad Israr Khan" />
+  <meta name="theme-color" content="#08080f" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="dark-theme">
-<div class="app-wrapper">
-    <aside id="mainSidebar" class="sidebar">
-        <div class="sidebar-header">
-            <div class="brand">MÎK AI</div>
-            <i class="fas fa-times close-sidebar" id="sidebarClose"></i>
-        </div>
-        <div class="profile-section">
-            <div class="user-avatar-circle"><span>MÎK</span></div>
-            <div class="user-info">
-                <h4>Mohammad Israr</h4>
-                <p>AI Developer</p>
-            </div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="nav-item active" id="navChat"><i class="fas fa-comment"></i> Chat</div>
-            <div class="nav-item" id="navHistory"><i class="fas fa-history"></i> History</div>
-            <div class="nav-item" id="navSettings"><i class="fas fa-cog"></i> Settings</div>
-        </nav>
-        <div class="creator-footer"><p>MÎK AI Premium v1.0</p></div>
-    </aside>
+<body>
 
-    <header class="modern-header">
-        <div class="menu-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
-        <div class="mode-toggle">
-            <button class="toggle-btn active" id="askMode">Ask</button>
-            <button class="toggle-btn" id="imagineMode">Imagine</button>
-        </div>
-        <div class="header-action-btn" id="headerNewChat"><i class="far fa-edit"></i></div>
-    </header>
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════ -->
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-top">
+    <div class="brand">
+      <span class="brand-saturn">🪐</span>
+      <span class="brand-name">MÎK AI</span>
+    </div>
+    <button class="icon-btn" id="sidebarClose" aria-label="Close sidebar">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 
-    <main class="chat-main">
-        <div id="settingsOverlay" class="full-overlay">
-            <div class="overlay-content">
-                <div class="overlay-header">
-                    <h3>Settings</h3>
-                    <i class="fas fa-times" id="closeSettings"></i>
-                </div>
-                <div class="setting-row">
-                    <span>AI Model</span>
-                    <select id="modelSelect">
-                        <option value="gemini">Google Gemini Pro</option>
-                        <option value="gpt4">ChatGPT-4 Turbo</option>
-                    </select>
-                </div>
-                <div class="setting-row">
-                    <span>Theme</span>
-                    <button id="themeToggle" class="mini-btn">Toggle Light/Dark</button>
-                </div>
-                <p class="setting-note">MÎK AI automatically optimizes performance.</p>
-            </div>
-        </div>
+  <button class="new-chat-btn" id="newChatBtn">
+    <i class="fas fa-plus"></i> New Chat
+  </button>
 
-        <div id="chat-flow">
-            <div class="welcome-screen">
-                <div class="big-logo">MÎK</div>
-                <h1>Welcome, Israr Jani</h1>
-                <p>Experience the next generation of AI.</p>
-            </div>
-        </div>
+  <div class="sidebar-section-label">MODE</div>
+  <div class="mode-pills">
+    <button class="mode-pill active" data-mode="general">
+      <i class="fas fa-star"></i> General
+    </button>
+    <button class="mode-pill" data-mode="islamic">
+      <i class="fas fa-moon"></i> Islamic
+    </button>
+    <button class="mode-pill" data-mode="imagine">
+      <i class="fas fa-image"></i> Imagine
+    </button>
+  </div>
 
-        <div class="input-container">
-            <div class="input-bar">
-                <button class="icon-btn" id="clipBtn"><i class="fas fa-paperclip"></i></button>
-                <button id="voiceBtn" class="icon-btn"><i class="fas fa-microphone"></i></button>
-                <input type="text" id="userInput" placeholder="Message MÎK AI...">
-                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </main>
+  <div class="sidebar-section-label">HISTORY</div>
+  <div id="historyList" class="history-list">
+    <p class="history-empty">No chats yet</p>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-chip">
+      <div class="user-avatar">M</div>
+      <div class="user-meta">
+        <span class="user-name">MÎK 🪐</span>
+        <span class="user-sub">Mohammad Israr Khan</span>
+      </div>
+    </div>
+    <p class="version-tag">MÎK AI v2.0</p>
+  </div>
+</aside>
+
+<!-- Sidebar overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- ═══ MAIN APP ══════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- Header -->
+  <header class="app-header">
+    <button class="icon-btn" id="sidebarToggle" aria-label="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="header-brand">
+      <span class="saturn-spin">🪐</span>
+      <span class="header-title">MÎK AI</span>
+      <span id="modeBadge" class="mode-badge general">✦ General</span>
+    </div>
+
+    <button class="icon-btn" id="newChatHeader" aria-label="New chat">
+      <i class="far fa-edit"></i>
+    </button>
+  </header>
+
+  <!-- Chat Area -->
+  <main class="chat-area" id="chatArea">
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-saturn">🪐</div>
+      <h1 class="welcome-title">Bismillah</h1>
+      <p class="welcome-sub">As-salamu alaykum, MÎK!<br/>I'm your cosmic AI. Ask me anything.</p>
+
+      <div class="suggestions">
+        <button class="suggestion-chip" data-q="What is the meaning of Surah Al-Fatiha?">📖 Surah Al-Fatiha meaning</button>
+        <button class="suggestion-chip" data-q="Help me write a professional email">✉️ Write a professional email</button>
+        <button class="suggestion-chip" data-q="Tell me about the Prophet Muhammad ﷺ">☪️ About Prophet Muhammad ﷺ</button>
+        <button class="suggestion-chip" data-q="Generate a cosmic galaxy image">🎨 Generate a galaxy image</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messageFlow" class="message-flow"></div>
+
+  </main>
+
+  <!-- Input Bar -->
+  <div class="input-zone">
+    <div class="input-bar">
+      <button class="icon-btn" id="voiceBtn" aria-label="Voice input">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <textarea
+        id="userInput"
+        placeholder="Message MÎK AI..."
+        rows="1"
+        aria-label="Message input"
+      ></textarea>
+      <button class="send-btn" id="sendBtn" aria-label="Send">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+    <p class="input-footer">MÎK AI 🪐 · Enter to send · Shift+Enter for new line</p>
+  </div>
+
 </div>
+
+<!-- ═══ SETTINGS MODAL ════════════════════════════════════════ -->
+<div id="settingsModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Settings</h3>
+      <button class="icon-btn" id="closeSettings"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="setting-row">
+      <span>Theme</span>
+      <button id="themeToggle" class="mini-btn">Toggle Light / Dark</button>
+    </div>
+    <div class="setting-row">
+      <span>Clear History</span>
+      <button id="clearHistory" class="mini-btn danger">Clear All</button>
+    </div>
+    <p class="setting-note">MÎK AI v2.0 · Powered by LLaMA 3.3 · Built by MÎK 🪐</p>
+  </div>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>
