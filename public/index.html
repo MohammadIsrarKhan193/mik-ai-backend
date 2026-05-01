@@ -6,31 +6,22 @@
   <title>MÎK AI 🪐</title>
   <meta name="description" content="MÎK AI — Cosmic Intelligence by Mohammad Israr Khan" />
   <meta name="theme-color" content="#08080f" />
-
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-
-  <!-- Icons & Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
-
-  <!-- Markdown -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ═══════════════════════════════════════════════ -->
+<!-- ═══ SIDEBAR ═══════════════════════════════════ -->
 <aside id="sidebar" class="sidebar">
   <div class="sidebar-top">
     <div class="brand">
       <span class="brand-saturn">🪐</span>
       <span class="brand-name">MÎK AI</span>
     </div>
-    <button class="icon-btn" id="sidebarClose" aria-label="Close sidebar">
-      <i class="fas fa-times"></i>
-    </button>
+    <button class="icon-btn" id="sidebarClose"><i class="fas fa-times"></i></button>
   </div>
 
   <button class="new-chat-btn" id="newChatBtn">
@@ -39,20 +30,23 @@
 
   <div class="sidebar-section-label">MODE</div>
   <div class="mode-pills">
-    <button class="mode-pill active" data-mode="general">
-      <i class="fas fa-star"></i> General
-    </button>
-    <button class="mode-pill" data-mode="islamic">
-      <i class="fas fa-moon"></i> Islamic
-    </button>
-    <button class="mode-pill" data-mode="imagine">
-      <i class="fas fa-image"></i> Imagine
-    </button>
+    <button class="mode-pill active" data-mode="general"><i class="fas fa-star"></i> General</button>
+    <button class="mode-pill" data-mode="islamic"><i class="fas fa-moon"></i> Islamic</button>
+    <button class="mode-pill" data-mode="imagine"><i class="fas fa-image"></i> Imagine</button>
+    <button class="mode-pill" data-mode="quiz"><i class="fas fa-brain"></i> Quiz</button>
   </div>
 
   <div class="sidebar-section-label">HISTORY</div>
   <div id="historyList" class="history-list">
     <p class="history-empty">No chats yet</p>
+  </div>
+
+  <div class="sidebar-section-label">EARN & UPGRADE</div>
+  <div class="monetize-section">
+    <button class="upgrade-btn" id="upgradeBtn">
+      <i class="fas fa-crown"></i> Go Premium 👑
+    </button>
+    <p class="earn-note">Unlock unlimited chats, no ads & priority AI</p>
   </div>
 
   <div class="sidebar-bottom">
@@ -62,82 +56,128 @@
         <span class="user-name">MÎK 🪐</span>
         <span class="user-sub">Mohammad Israr Khan</span>
       </div>
+      <button class="icon-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
     </div>
-    <p class="version-tag">MÎK AI v2.0</p>
+    <p class="version-tag">MÎK AI v2.0 · Free Plan</p>
   </div>
 </aside>
 
-<!-- Sidebar overlay -->
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-<!-- ═══ MAIN APP ══════════════════════════════════════════════ -->
+<!-- ═══ MAIN APP ══════════════════════════════════ -->
 <div class="app-shell">
 
-  <!-- Header -->
   <header class="app-header">
-    <button class="icon-btn" id="sidebarToggle" aria-label="Menu">
-      <i class="fas fa-bars"></i>
-    </button>
-
+    <button class="icon-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
     <div class="header-brand">
       <span class="saturn-spin">🪐</span>
       <span class="header-title">MÎK AI</span>
       <span id="modeBadge" class="mode-badge general">✦ General</span>
     </div>
-
-    <button class="icon-btn" id="newChatHeader" aria-label="New chat">
-      <i class="far fa-edit"></i>
-    </button>
+    <button class="icon-btn" id="newChatHeader"><i class="far fa-edit"></i></button>
   </header>
 
-  <!-- Chat Area -->
   <main class="chat-area" id="chatArea">
 
-    <!-- Welcome Screen -->
+    <!-- Welcome -->
     <div class="welcome-screen" id="welcomeScreen">
       <div class="welcome-saturn">🪐</div>
-      <h1 class="welcome-title">Bismillahirrahmanirrahim</h1>
-      <p class="welcome-sub">As-salamu alaykum, MÎK!<br/>I'm your cosmic AI. Ask me anything.</p>
-
+      <h1 class="welcome-title">Bismillah</h1>
+      <p class="welcome-sub">As-salamu alaykum, MÎK!<br/>Your cosmic AI is ready.</p>
       <div class="suggestions">
-        <button class="suggestion-chip" data-q="What is the meaning of Surah Al-Fatiha?">📖 Surah Al-Fatiha meaning</button>
-        <button class="suggestion-chip" data-q="Help me write a professional email">✉️ Write a professional email</button>
-        <button class="suggestion-chip" data-q="Tell me about the Prophet Muhammad ﷺ">☪️ About Prophet Muhammad ﷺ</button>
-        <button class="suggestion-chip" data-q="Generate a cosmic galaxy image">🎨 Generate a galaxy image</button>
+        <button class="suggestion-chip" data-q="What is the meaning of Surah Al-Fatiha?">📖 Surah Al-Fatiha</button>
+        <button class="suggestion-chip" data-q="Help me write a professional email">✉️ Write an email</button>
+        <button class="suggestion-chip" data-q="Generate a cosmic galaxy artwork">🎨 Generate art</button>
+        <button class="suggestion-chip" data-q="Give me a quiz about Islamic history">🧠 Islamic quiz</button>
       </div>
     </div>
 
-    <!-- Messages -->
-    <div id="messageFlow" class="message-flow"></div>
+    <!-- Quiz UI -->
+    <div id="quizPanel" class="quiz-panel hidden">
+      <div class="quiz-box">
+        <div class="quiz-header">
+          <span>🧠 MÎK Quiz</span>
+          <button class="icon-btn" id="closeQuiz"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="quizQuestion" class="quiz-question">Loading question...</div>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizResult" class="quiz-result hidden"></div>
+        <button class="quiz-next-btn hidden" id="quizNextBtn">Next Question ➤</button>
+      </div>
+    </div>
 
+    <div id="messageFlow" class="message-flow"></div>
   </main>
 
-  <!-- Input Bar -->
+  <!-- Input -->
   <div class="input-zone">
-    <div class="input-bar">
-      <button class="icon-btn" id="voiceBtn" aria-label="Voice input">
-        <i class="fas fa-microphone"></i>
-      </button>
-      <textarea
-        id="userInput"
-        placeholder="Message MÎK AI..."
-        rows="1"
-        aria-label="Message input"
-      ></textarea>
-      <button class="send-btn" id="sendBtn" aria-label="Send">
-        <i class="fas fa-paper-plane"></i>
-      </button>
-    </div>
-    <p class="input-footer">MÎK AI 🪐 · Enter to send · Shift+Enter for new line</p>
-  </div>
 
+    <!-- Ad Banner (Monetization) -->
+    <div id="adBanner" class="ad-banner hidden">
+      <span>✨ MÎK AI Premium — Unlimited chats, no ads</span>
+      <button id="adUpgradeBtn" class="ad-upgrade-btn">Upgrade 👑</button>
+      <button id="adClose" class="ad-close"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="input-bar">
+      <button class="icon-btn" id="voiceRoomBtn" title="Voice Room"><i class="fas fa-microphone-lines"></i></button>
+      <button class="icon-btn" id="uploadBtn" title="Upload file"><i class="fas fa-paperclip"></i></button>
+      <button class="icon-btn" id="cameraBtn" title="Camera"><i class="fas fa-camera"></i></button>
+      <textarea id="userInput" placeholder="Message MÎK AI..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+
+    <!-- Hidden inputs -->
+    <input type="file" id="fileInput" accept="*/*" style="display:none" />
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" />
+
+    <p class="input-footer">MÎK AI 🪐 · Enter to send · Shift+Enter new line</p>
+  </div>
 </div>
 
-<!-- ═══ SETTINGS MODAL ════════════════════════════════════════ -->
+<!-- ═══ PREMIUM MODAL ═════════════════════════════ -->
+<div id="premiumModal" class="modal-overlay hidden">
+  <div class="modal-box premium-modal">
+    <div class="modal-header">
+      <h3>👑 MÎK AI Premium</h3>
+      <button class="icon-btn" id="closePremium"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="premium-plans">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <ul class="plan-features">
+          <li>✓ 20 messages/day</li>
+          <li>✓ General & Islamic mode</li>
+          <li>✓ Image generation</li>
+          <li>✗ Voice room</li>
+          <li>✗ File uploads</li>
+        </ul>
+      </div>
+      <div class="plan-card premium">
+        <div class="plan-badge">BEST 🔥</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">$4.99<span>/mo</span></div>
+        <ul class="plan-features">
+          <li>✓ Unlimited messages</li>
+          <li>✓ All modes + Quiz</li>
+          <li>✓ Voice room</li>
+          <li>✓ File uploads</li>
+          <li>✓ No ads</li>
+          <li>✓ Priority AI</li>
+        </ul>
+        <button class="get-premium-btn" id="getPremiumBtn">Get Premium 👑</button>
+      </div>
+    </div>
+    <p class="setting-note">Payments via Stripe — coming soon Insha'Allah 🪐</p>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS MODAL ════════════════════════════ -->
 <div id="settingsModal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>Settings</h3>
+      <h3>⚙️ Settings</h3>
       <button class="icon-btn" id="closeSettings"><i class="fas fa-times"></i></button>
     </div>
     <div class="setting-row">
@@ -148,7 +188,7 @@
       <span>Clear History</span>
       <button id="clearHistory" class="mini-btn danger">Clear All</button>
     </div>
-    <p class="setting-note">MÎK AI v2.0 · Powered by LLaMA 3.3 · Built by MÎK 🪐</p>
+    <p class="setting-note">MÎK AI v2.0 · Built by MÎK 🪐</p>
   </div>
 </div>
 
