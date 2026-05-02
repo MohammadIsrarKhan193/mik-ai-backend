@@ -1,14 +1,15 @@
 /* ═══════════════════════════════════════════════
-   MÎK AI — index.js v2.0 🪐
+   MÎK AI — index.js v2.1 🪐
    By Mohammad Israr Khan
 ═══════════════════════════════════════════════ */
 
-const express = require("express");
-const Groq = require("groq-sdk");
-const cors = require("cors");
-const multer = require("multer");
-const path = require("path");
-require("dotenv").config();
+import express from "express";
+import Groq from "groq-sdk";
+import cors from "cors";
+import multer from "multer";
+import fetch from "node-fetch";
+import { config } from "dotenv";
+config();
 
 const app = express();
 const upload = multer({ dest: "uploads/", limits: { fileSize: 10 * 1024 * 1024 } });
@@ -22,9 +23,17 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const chatHistory = {};
 
 // ─── System Prompts ──────────────────────────────
-const GENERAL_PROMPT = `You are MÎK AI 🪐 — a powerful, cosmic AI assistant created by Mohammad Israr Khan (MÎK). You are smart, helpful, friendly, and a little cosmic in personality. Help with anything: coding, writing, ideas, analysis, and more. Keep responses clear and useful.`;
+const GENERAL_PROMPT = `You are MÎK AI 🪐 — a powerful, cosmic AI assistant created by Mohammad Israr Khan (MÎK). You are smart, helpful, friendly, and cosmic in personality.
 
-const ISLAMIC_PROMPT = `You are MÎK AI 🪐 in Islamic Mode — a knowledgeable Islamic assistant created by Mohammad Israr Khan (MÎK). You specialize in Quran tafsir, Hadith, Fiqh, Islamic history, duas, and practical Islamic guidance. Use Islamic etiquette naturally — Bismillah, Insha'Allah, Alhamdulillah, Masha'Allah. Always recommend consulting a qualified scholar for personal fatwas. Be warm, humble, and knowledgeable.`;
+IMPORTANT: Always reply in the SAME language the user writes in. If they write in Urdu reply in Urdu. If Pashto reply in Pashto. If Arabic reply in Arabic. If English reply in English. If Dari reply in Dari. Auto-detect and match the user language every time.
+
+Help with anything: coding, writing, ideas, analysis, and more. Keep responses clear and useful.`;
+
+const ISLAMIC_PROMPT = `You are MÎK AI 🪐 in Islamic Mode — a knowledgeable Islamic assistant created by Mohammad Israr Khan (MÎK).
+
+IMPORTANT: Always reply in the SAME language the user writes in. Auto-detect and match language every time.
+
+You specialize in Quran tafsir, Hadith, Fiqh, Islamic history, duas, and practical Islamic guidance. Use Islamic etiquette naturally — Bismillah, Insha'Allah, Alhamdulillah, Masha'Allah. Always recommend consulting a qualified scholar for personal fatwas. Be warm, humble, and knowledgeable.`;
 
 const QUIZ_PROMPT = `You are MÎK AI 🪐 in Quiz Mode. Generate a fun quiz question with 4 options (A, B, C, D) and indicate the correct answer. Format your response EXACTLY like this:
 QUESTION: [question here]
@@ -35,10 +44,10 @@ D) [option]
 ANSWER: [correct letter]
 EXPLANATION: [brief explanation]`;
 
-const VOICE_PROMPT = `You are MÎK AI in voice mode. Give SHORT, conversational spoken answers. Max 2-3 sentences. No markdown, no bullet points, no emojis. Just natural speech.`;
+const VOICE_PROMPT = `You are MÎK AI in voice mode. Give SHORT, conversational spoken answers. Max 2-3 sentences. No markdown, no bullet points, no emojis. Just natural speech. Match the language the user spoke in.`;
 
 // ─── Image Keywords ──────────────────────────────
-const IMAGE_KEYWORDS = ["create", "generate", "draw", "imagine", "picture", "image", "pic", "design", "make a photo", "paint"];
+const IMAGE_KEYWORDS = ["create", "generate", "draw", "imagine", "picture", "image", "pic", "design", "make a photo", "paint", "بنا", "تصویر", "جنریٹ"];
 const isImageRequest = (text) => IMAGE_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
 
 // ─── Main Chat Route ─────────────────────────────
@@ -53,8 +62,10 @@ app.post("/chat", async (req, res) => {
 
     // 🎨 Image Generation
     if (isImageRequest(trimmed) || mode === "imagine") {
-      const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(trimmed)}?width=512&height=512&seed=${Math.floor(Math.random() * 9999)}&nologo=true`;
-      return res.json({ reply: `IMAGE_GEN:${imageUrl}` });
+      const encodedPrompt = encodeURIComponent(trimmed);
+      return res.json({
+        reply: `IMAGE_GEN:/generate-image?prompt=${encodedPrompt}`
+      });
     }
 
     // 📝 Quiz Mode
@@ -97,7 +108,28 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// ─── Voice Route ─────────────────────────────────
+// ─── Image Generation Route ───────────────────────
+app.get("/generate-image", async (req, res) => {
+  try {
+    const { prompt } = req.query;
+    if (!prompt) return res.status(400).json({ error: "No prompt" });
+
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${Math.floor(Math.random() * 9999)}&nologo=true&enhance=true`;
+
+    const response = await fetch(imageUrl, { timeout: 30000 });
+    if (!response.ok) throw new Error("Image fetch failed");
+
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    response.body.pipe(res);
+
+  } catch (e) {
+    console.error("Image error:", e.message);
+    res.status(500).json({ error: "Image generation failed" });
+  }
+});
+
+// ─── Voice Route ──────────────────────────────────
 app.post("/speak", async (req, res) => {
   try {
     const { text } = req.body;
@@ -125,17 +157,14 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-    const fileUrl = `/uploads/${req.file.filename}`;
     const originalName = req.file.originalname;
     const mimeType = req.file.mimetype;
     const isImage = mimeType.startsWith("image/");
+    const fileUrl = `/uploads/${req.file.filename}`;
 
-    let aiComment = "";
-    if (isImage) {
-      aiComment = `I can see you uploaded an image: **${originalName}**. Masha'Allah! Image analysis coming soon. For now I can generate images — just say "generate [description]"! 🪐`;
-    } else {
-      aiComment = `File received: **${originalName}** (${(req.file.size / 1024).toFixed(1)} KB). File reading feature coming soon Insha'Allah! 🪐`;
-    }
+    const aiComment = isImage
+      ? `I can see you uploaded an image: **${originalName}**. Masha'Allah! 🪐`
+      : `File received: **${originalName}** (${(req.file.size / 1024).toFixed(1)} KB). 🪐`;
 
     res.json({ fileUrl, originalName, mimeType, isImage, aiComment });
   } catch (e) {
@@ -164,7 +193,7 @@ app.post("/quiz", async (req, res) => {
 
 // ─── Health Check ─────────────────────────────────
 app.get("/health", (req, res) => {
-  res.json({ status: "online", name: "MÎK AI Backend 🪐", version: "2.0" });
+  res.json({ status: "online", name: "MÎK AI Backend 🪐", version: "2.1" });
 });
 
 // ─── Start Server ─────────────────────────────────
