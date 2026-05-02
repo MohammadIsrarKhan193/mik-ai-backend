@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   MÎK AI — app.js v2.0 🪐
+   MÎK AI — app.js v2.1 🪐
    By Mohammad Israr Khan
 ═══════════════════════════════════════════════ */
 
@@ -15,7 +15,6 @@ const welcomeScreen  = document.getElementById("welcomeScreen");
 const messageFlow    = document.getElementById("messageFlow");
 const userInput      = document.getElementById("userInput");
 const sendBtn        = document.getElementById("sendBtn");
-const voiceBtn       = document.getElementById("voiceBtn");
 const voiceRoomBtn   = document.getElementById("voiceRoomBtn");
 const uploadBtn      = document.getElementById("uploadBtn");
 const cameraBtn      = document.getElementById("cameraBtn");
@@ -29,15 +28,15 @@ const modePills      = document.querySelectorAll(".mode-pill");
 const suggestionChips= document.querySelectorAll(".suggestion-chip");
 
 // ─── State ───────────────────────────────────────
-let currentMode    = "general";
-let isLoading      = false;
-let voiceRoomActive= false;
-let isSpeaking     = false;
-let activeChatId   = null;
-let sessionMessages= [];
-let messageCount   = 0;
-let chats          = JSON.parse(localStorage.getItem("mik_chats") || "[]");
-let currentQuiz    = null;
+let currentMode     = "general";
+let isLoading       = false;
+let voiceRoomActive = false;
+let isSpeaking      = false;
+let activeChatId    = null;
+let sessionMessages = [];
+let messageCount    = 0;
+let chats           = JSON.parse(localStorage.getItem("mik_chats") || "[]");
+let currentQuiz     = null;
 
 // ─── Sidebar ─────────────────────────────────────
 sidebarToggle.onclick = () => { sidebar.classList.add("open"); sidebarOverlay.classList.add("show"); };
@@ -54,9 +53,8 @@ modePills.forEach(pill => {
     currentMode = pill.dataset.mode;
     modeBadge.className = `mode-badge ${currentMode}`;
     modeBadge.textContent = modeBadgeLabels[currentMode];
-
     if (currentMode === "quiz") startQuiz();
-    else { quizPanel.classList.add("hidden"); }
+    else quizPanel.classList.add("hidden");
     closeSidebar();
   };
 });
@@ -103,10 +101,10 @@ const premiumModal = document.getElementById("premiumModal");
 document.getElementById("upgradeBtn").onclick = () => { premiumModal.classList.remove("hidden"); closeSidebar(); };
 document.getElementById("closePremium").onclick = () => premiumModal.classList.add("hidden");
 document.getElementById("getPremiumBtn").onclick = () => alert("Stripe payments coming soon Insha'Allah! 🪐");
-document.getElementById("adUpgradeBtn").onclick = () => { premiumModal.classList.remove("hidden"); };
+document.getElementById("adUpgradeBtn").onclick = () => premiumModal.classList.remove("hidden");
 document.getElementById("adClose").onclick = () => adBanner.classList.add("hidden");
 
-// ─── Ad / Monetization Logic ─────────────────────
+// ─── Ad Logic ────────────────────────────────────
 function checkAds() {
   messageCount++;
   if (messageCount % 5 === 0) {
@@ -154,10 +152,29 @@ function appendBubble(content, role, animate = true) {
 
   let bubbleHTML = "";
   if (isImage) {
+    const uid = Date.now();
     bubbleHTML = `
       <div class="ai-image-wrapper">
-        <img src="${imageUrl}" alt="MÎK AI Art" class="generated-img" onerror="this.style.display='none'" />
-        <a href="${imageUrl}" target="_blank" class="dl-btn"><i class="fas fa-download"></i> Save to Gallery</a>
+        <div class="img-loading" id="imgLoad_${uid}">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+          <p style="font-size:11px;color:var(--text-dim);margin-top:8px">Generating image... 🎨</p>
+        </div>
+        <img
+          src="${imageUrl}"
+          alt="MÎK AI Art"
+          class="generated-img"
+          style="display:none"
+          onload="
+            this.style.display='block';
+            document.getElementById('imgLoad_${uid}').style.display='none';
+          "
+          onerror="
+            document.getElementById('imgLoad_${uid}').innerHTML='<p style=color:#ef4444;font-size:13px>Image failed. Try again! 🪐</p>';
+          "
+        />
+        <a href="${imageUrl}" target="_blank" class="dl-btn">
+          <i class="fas fa-download"></i> Save to Gallery
+        </a>
       </div>`;
   } else {
     bubbleHTML = isUser ? escapeHTML(content) : marked.parse(content);
@@ -226,8 +243,13 @@ async function send() {
 }
 
 sendBtn.onclick = send;
-userInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
-function autoResize() { userInput.style.height = "auto"; userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px"; }
+userInput.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+});
+function autoResize() {
+  userInput.style.height = "auto";
+  userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px";
+}
 userInput.addEventListener("input", autoResize);
 
 // ─── File Upload ─────────────────────────────────
@@ -239,20 +261,18 @@ async function handleFile(file) {
   welcomeScreen.style.display = "none";
   messageFlow.style.display = "flex";
 
-  // Show file preview in chat
   const isImage = file.type.startsWith("image/");
   const row = document.createElement("div");
   row.className = "msg-row user";
   if (isImage) {
     const url = URL.createObjectURL(file);
-    row.innerHTML = `<div class="msg-bubble"><div class="ai-image-wrapper"><img src="${url}" class="generated-img" style="border-color:var(--purple-light)" /><span style="font-size:11px;color:var(--text-dim)">${file.name}</span></div></div><div class="user-msg-avatar">M</div>`;
+    row.innerHTML = `<div class="msg-bubble"><div class="ai-image-wrapper"><img src="${url}" class="generated-img" style="border-color:var(--purple-light)"/><span style="font-size:11px;color:var(--text-dim)">${file.name}</span></div></div><div class="user-msg-avatar">M</div>`;
   } else {
     row.innerHTML = `<div class="msg-bubble"><div class="uploaded-file-preview"><i class="fas fa-file"></i><span class="file-name">${file.name}</span></div></div><div class="user-msg-avatar">M</div>`;
   }
   messageFlow.appendChild(row);
   chatArea.scrollTop = chatArea.scrollHeight;
 
-  // Upload to backend
   showTyping();
   const formData = new FormData();
   formData.append("file", file);
@@ -297,17 +317,14 @@ function parseAndRenderQuiz(raw) {
   if (!raw) return;
   const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
   let question = "", options = [], answer = "", explanation = "";
-
   lines.forEach(line => {
     if (line.startsWith("QUESTION:")) question = line.replace("QUESTION:", "").trim();
     else if (line.startsWith("ANSWER:")) answer = line.replace("ANSWER:", "").trim().toUpperCase();
     else if (line.startsWith("EXPLANATION:")) explanation = line.replace("EXPLANATION:", "").trim();
     else if (/^[A-D]\)/.test(line)) options.push(line);
   });
-
   currentQuiz = { answer, explanation };
-  document.getElementById("quizQuestion").textContent = question || "What is the capital of France?";
-
+  document.getElementById("quizQuestion").textContent = question;
   const optionsEl = document.getElementById("quizOptions");
   optionsEl.innerHTML = "";
   options.forEach(opt => {
@@ -317,24 +334,20 @@ function parseAndRenderQuiz(raw) {
     btn.onclick = () => checkAnswer(opt.charAt(0).toUpperCase(), btn);
     optionsEl.appendChild(btn);
   });
-
   document.getElementById("quizNextBtn").classList.add("hidden");
 }
 
 function checkAnswer(selected, btn) {
   if (!currentQuiz) return;
-  const allOptions = document.querySelectorAll(".quiz-option");
-  allOptions.forEach(b => { b.onclick = null; });
-
+  document.querySelectorAll(".quiz-option").forEach(b => b.onclick = null);
   if (selected === currentQuiz.answer) {
     btn.classList.add("correct");
   } else {
     btn.classList.add("wrong");
-    allOptions.forEach(b => {
+    document.querySelectorAll(".quiz-option").forEach(b => {
       if (b.textContent.startsWith(currentQuiz.answer)) b.classList.add("correct");
     });
   }
-
   const result = document.getElementById("quizResult");
   result.className = "quiz-result show";
   result.textContent = `💡 ${currentQuiz.explanation}`;
@@ -383,7 +396,6 @@ function startListening() {
   roomRecognition.lang = "en-US";
   roomRecognition.continuous = false;
   roomRecognition.interimResults = false;
-
   roomRecognition.onresult = async e => {
     const said = e.results[0][0].transcript;
     if (!said) return;
@@ -417,7 +429,8 @@ voiceRoomBtn.onclick = () => {
   if (voiceRoomActive) {
     voiceRoomBtn.classList.add("active");
     voiceRoomBtn.innerHTML = `<i class="fas fa-ear-listen"></i>`;
-    speak("Assalamu Alaykum! MÎK AI voice room is active. How can I help you?").then(() => startListening());
+    speak("Assalamu Alaykum! MÎK AI voice room is active. How can I help you?")
+      .then(() => startListening());
   } else {
     voiceRoomActive = false;
     roomRecognition?.stop();
