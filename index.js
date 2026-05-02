@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   MÎK AI — index.js v2.1 🪐
+   MÎK AI — index.js v2.2 🪐
    By Mohammad Israr Khan
 ═══════════════════════════════════════════════ */
 
@@ -46,9 +46,12 @@ EXPLANATION: [brief explanation]`;
 
 const VOICE_PROMPT = `You are MÎK AI in voice mode. Give SHORT, conversational spoken answers. Max 2-3 sentences. No markdown, no bullet points, no emojis. Just natural speech. Match the language the user spoke in.`;
 
-// ─── Image Keywords ──────────────────────────────
+// ─── Keywords ────────────────────────────────────
 const IMAGE_KEYWORDS = ["create", "generate", "draw", "imagine", "picture", "image", "pic", "design", "make a photo", "paint", "بنا", "تصویر", "جنریٹ"];
+const LOGO_KEYWORDS  = ["icon", "logo", "app icon", "brand", "symbol", "badge", "watermark", "trademark"];
+
 const isImageRequest = (text) => IMAGE_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
+const isLogoRequest  = (text) => LOGO_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
 
 // ─── Main Chat Route ─────────────────────────────
 app.post("/chat", async (req, res) => {
@@ -62,6 +65,14 @@ app.post("/chat", async (req, res) => {
 
     // 🎨 Image Generation
     if (isImageRequest(trimmed) || mode === "imagine") {
+
+      // 🚫 Block logo/icon requests
+      if (isLogoRequest(trimmed)) {
+        return res.json({
+          reply: `I can't generate logos or icons accurately — image AI isn't good at text and clean designs! 🪐\n\nFor a professional MÎK AI icon try:\n- **[Canva.com](https://canva.com)** — free & easy\n- **[Adobe Express](https://express.adobe.com)** — free logo maker\n- **[Looka.com](https://looka.com)** — AI logo generator\n\nOr ask me to generate a **cosmic artwork, galaxy, portrait, landscape** — I'm great at those! 🎨`
+        });
+      }
+
       const encodedPrompt = encodeURIComponent(trimmed);
       return res.json({
         reply: `IMAGE_GEN:/generate-image?prompt=${encodedPrompt}`
@@ -102,6 +113,7 @@ app.post("/chat", async (req, res) => {
     if (chatHistory[id].length > 20) chatHistory[id] = chatHistory[id].slice(-20);
 
     res.json({ reply });
+
   } catch (error) {
     console.error("MÎK AI Error:", error?.message || error);
     res.status(500).json({ reply: "MÎK AI is busy right now. Please try again! 🪐" });
@@ -193,7 +205,7 @@ app.post("/quiz", async (req, res) => {
 
 // ─── Health Check ─────────────────────────────────
 app.get("/health", (req, res) => {
-  res.json({ status: "online", name: "MÎK AI Backend 🪐", version: "2.1" });
+  res.json({ status: "online", name: "MÎK AI Backend 🪐", version: "2.2" });
 });
 
 // ─── Start Server ─────────────────────────────────
