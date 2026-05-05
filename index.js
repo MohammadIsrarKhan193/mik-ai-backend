@@ -1,213 +1,124 @@
-/* ═══════════════════════════════════════════════
-   MÎK AI — index.js v2.2 🪐
-   By Mohammad Israr Khan
-═══════════════════════════════════════════════ */
+// ============================================================
+//  MÎK AI — index.js  (Node.js / Railway Backend)
+//  Firebase Google Token Verification + JWT Session
+//  Built by Mohammad Israr Khan (Afghanistan)
+// ============================================================
 
-import express from "express";
-import Groq from "groq-sdk";
-import cors from "cors";
-import multer from "multer";
-import fetch from "node-fetch";
-import { config } from "dotenv";
-config();
+const express    = require("express");
+const cors       = require("cors");
+const admin      = require("firebase-admin");
+const jwt        = require("jsonwebtoken");
+require("dotenv").config();
 
-const app = express();
-const upload = multer({ dest: "uploads/", limits: { fileSize: 10 * 1024 * 1024 } });
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const chatHistory = {};
-
-// ─── System Prompts ──────────────────────────────
-const GENERAL_PROMPT = `You are MÎK AI 🪐 — a powerful, cosmic AI assistant created by Mohammad Israr Khan (MÎK). You are smart, helpful, friendly, and cosmic in personality.
-
-IMPORTANT: Always reply in the SAME language the user writes in. If they write in Urdu reply in Urdu. If Pashto reply in Pashto. If Arabic reply in Arabic. If English reply in English. If Dari reply in Dari. Auto-detect and match the user language every time.
-
-Help with anything: coding, writing, ideas, analysis, and more. Keep responses clear and useful.`;
-
-const ISLAMIC_PROMPT = `You are MÎK AI 🪐 in Islamic Mode — a knowledgeable Islamic assistant created by Mohammad Israr Khan (MÎK).
-
-IMPORTANT: Always reply in the SAME language the user writes in. Auto-detect and match language every time.
-
-You specialize in Quran tafsir, Hadith, Fiqh, Islamic history, duas, and practical Islamic guidance. Use Islamic etiquette naturally — Bismillah, Insha'Allah, Alhamdulillah, Masha'Allah. Always recommend consulting a qualified scholar for personal fatwas. Be warm, humble, and knowledgeable.`;
-
-const QUIZ_PROMPT = `You are MÎK AI 🪐 in Quiz Mode. Generate a fun quiz question with 4 options (A, B, C, D) and indicate the correct answer. Format your response EXACTLY like this:
-QUESTION: [question here]
-A) [option]
-B) [option]
-C) [option]
-D) [option]
-ANSWER: [correct letter]
-EXPLANATION: [brief explanation]`;
-
-const VOICE_PROMPT = `You are MÎK AI in voice mode. Give SHORT, conversational spoken answers. Max 2-3 sentences. No markdown, no bullet points, no emojis. Just natural speech. Match the language the user spoke in.`;
-
-// ─── Keywords ────────────────────────────────────
-const IMAGE_KEYWORDS = ["create", "generate", "draw", "imagine", "picture", "image", "pic", "design", "make a photo", "paint", "بنا", "تصویر", "جنریٹ"];
-const LOGO_KEYWORDS  = ["icon", "logo", "app icon", "brand", "symbol", "badge", "watermark", "trademark"];
-
-const isImageRequest = (text) => IMAGE_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
-const isLogoRequest  = (text) => LOGO_KEYWORDS.some((kw) => text.toLowerCase().includes(kw));
-
-// ─── Main Chat Route ─────────────────────────────
-app.post("/chat", async (req, res) => {
-  try {
-    const { message, userId, mode } = req.body;
-    if (!message || typeof message !== "string" || !message.trim())
-      return res.status(400).json({ reply: "Please send a valid message." });
-
-    const id = userId || "guest";
-    const trimmed = message.trim();
-
-    // 🎨 Image Generation
-    if (isImageRequest(trimmed) || mode === "imagine") {
-
-      // 🚫 Block logo/icon requests
-      if (isLogoRequest(trimmed)) {
-        return res.json({
-          reply: `I can't generate logos or icons accurately — image AI isn't good at text and clean designs! 🪐\n\nFor a professional MÎK AI icon try:\n- **[Canva.com](https://canva.com)** — free & easy\n- **[Adobe Express](https://express.adobe.com)** — free logo maker\n- **[Looka.com](https://looka.com)** — AI logo generator\n\nOr ask me to generate a **cosmic artwork, galaxy, portrait, landscape** — I'm great at those! 🎨`
-        });
-      }
-
-      const encodedPrompt = encodeURIComponent(trimmed);
-      return res.json({
-        reply: `IMAGE_GEN:/generate-image?prompt=${encodedPrompt}`
-      });
-    }
-
-    // 📝 Quiz Mode
-    if (mode === "quiz") {
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: QUIZ_PROMPT },
-          { role: "user", content: trimmed }
-        ],
-        temperature: 0.8,
-        max_tokens: 300
-      });
-      return res.json({ reply: completion.choices[0]?.message?.content, type: "quiz" });
-    }
-
-    // 💬 Normal Chat
-    if (!chatHistory[id]) chatHistory[id] = [];
-    const systemPrompt = mode === "islamic" ? ISLAMIC_PROMPT : GENERAL_PROMPT;
-
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...chatHistory[id],
-        { role: "user", content: trimmed }
-      ],
-      temperature: 0.7,
-      max_tokens: 1024
-    });
-
-    const reply = completion.choices[0]?.message?.content || "No response received.";
-    chatHistory[id].push({ role: "user", content: trimmed }, { role: "assistant", content: reply });
-    if (chatHistory[id].length > 20) chatHistory[id] = chatHistory[id].slice(-20);
-
-    res.json({ reply });
-
-  } catch (error) {
-    console.error("MÎK AI Error:", error?.message || error);
-    res.status(500).json({ reply: "MÎK AI is busy right now. Please try again! 🪐" });
-  }
-});
-
-// ─── Image Generation Route ───────────────────────
-app.get("/generate-image", async (req, res) => {
-  try {
-    const { prompt } = req.query;
-    if (!prompt) return res.status(400).json({ error: "No prompt" });
-
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${Math.floor(Math.random() * 9999)}&nologo=true&enhance=true`;
-
-    const response = await fetch(imageUrl, { timeout: 30000 });
-    if (!response.ok) throw new Error("Image fetch failed");
-
-    res.setHeader("Content-Type", "image/jpeg");
-    res.setHeader("Cache-Control", "public, max-age=86400");
-    response.body.pipe(res);
-
-  } catch (e) {
-    console.error("Image error:", e.message);
-    res.status(500).json({ error: "Image generation failed" });
-  }
-});
-
-// ─── Voice Route ──────────────────────────────────
-app.post("/speak", async (req, res) => {
-  try {
-    const { text } = req.body;
-    if (!text) return res.status(400).json({ error: "No text provided" });
-
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: VOICE_PROMPT },
-        { role: "user", content: text }
-      ],
-      max_tokens: 150,
-      temperature: 0.7
-    });
-
-    const reply = completion.choices[0]?.message?.content || "Sorry, I didn't catch that.";
-    res.json({ reply });
-  } catch (e) {
-    res.status(500).json({ error: "Voice error" });
-  }
-});
-
-// ─── File Upload Route ────────────────────────────
-app.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-    const originalName = req.file.originalname;
-    const mimeType = req.file.mimetype;
-    const isImage = mimeType.startsWith("image/");
-    const fileUrl = `/uploads/${req.file.filename}`;
-
-    const aiComment = isImage
-      ? `I can see you uploaded an image: **${originalName}**. Masha'Allah! 🪐`
-      : `File received: **${originalName}** (${(req.file.size / 1024).toFixed(1)} KB). 🪐`;
-
-    res.json({ fileUrl, originalName, mimeType, isImage, aiComment });
-  } catch (e) {
-    res.status(500).json({ error: "Upload failed" });
-  }
-});
-
-// ─── Quiz Route ───────────────────────────────────
-app.post("/quiz", async (req, res) => {
-  try {
-    const { topic } = req.body;
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: QUIZ_PROMPT },
-        { role: "user", content: `Generate a quiz question about: ${topic || "general knowledge"}` }
-      ],
-      temperature: 0.8,
-      max_tokens: 300
-    });
-    res.json({ quiz: completion.choices[0]?.message?.content });
-  } catch (e) {
-    res.status(500).json({ error: "Quiz generation failed" });
-  }
-});
-
-// ─── Health Check ─────────────────────────────────
-app.get("/health", (req, res) => {
-  res.json({ status: "online", name: "MÎK AI Backend 🪐", version: "2.2" });
-});
-
-// ─── Start Server ─────────────────────────────────
+const app  = express();
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 MÎK AI Backend online — Port ${PORT}`));
+
+// ── CORS ─────────────────────────────────────────────────────
+// Allow your frontend origin(s) — update as needed
+app.use(cors({
+  origin: [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    process.env.FRONTEND_URL || "*",
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.use(express.json());
+
+// ── Firebase Admin Init ───────────────────────────────────────
+// Option A: service account JSON in env var (recommended for Railway)
+let serviceAccount;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+} else {
+  // Option B: local file (dev only — add to .gitignore!)
+  serviceAccount = require("./serviceAccountKey.json");
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+}
+
+// ── JWT secret (set in Railway environment variables) ─────────
+const JWT_SECRET  = process.env.JWT_SECRET  || "mik-ai-secret-change-me";
+const JWT_EXPIRES = process.env.JWT_EXPIRES || "7d";
+
+// ── Health check ──────────────────────────────────────────────
+app.get("/", (_req, res) => {
+  res.json({ status: "🪐 MÎK AI backend is live", version: "1.0.0" });
+});
+
+// ── POST /auth/google ─────────────────────────────────────────
+// Frontend sends the Firebase idToken; we verify it and return a session JWT
+app.post("/auth/google", async (req, res) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    return res.status(400).json({ message: "idToken is required." });
+  }
+
+  try {
+    // Verify the Firebase ID token
+    const decoded = await admin.auth().verifyIdToken(idToken);
+
+    const user = {
+      uid:   decoded.uid,
+      name:  decoded.name  || "Anonymous",
+      email: decoded.email || "",
+      photo: decoded.picture || "",
+    };
+
+    // Issue your own session JWT
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+
+    console.log(`[MÎK AI] ✅ User signed in: ${user.email}`);
+
+    return res.json({
+      success: true,
+      token,
+      user,
+    });
+
+  } catch (err) {
+    console.error("[MÎK AI] Token verification failed:", err.message);
+    return res.status(401).json({ message: "Invalid or expired token." });
+  }
+});
+
+// ── Middleware: verify session JWT ───────────────────────────
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Missing auth token." });
+  }
+  const token = authHeader.slice(7);
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ message: "Token invalid or expired." });
+  }
+}
+
+// ── Protected: GET /me ────────────────────────────────────────
+app.get("/me", requireAuth, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// ── Protected: POST /chat ─────────────────────────────────────
+// Placeholder — plug your Groq logic here
+app.post("/chat", requireAuth, async (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ message: "message is required." });
+  }
+  // TODO: call Groq API with req.user context
+  res.json({
+    reply: `[MÎK AI] Echo from ${req.user.name}: "${message}" — Groq integration coming soon.`,
+  });
+});
+
+// ── Start server ──────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`🪐 MÎK AI backend running on port ${PORT}`);
+});
