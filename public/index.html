@@ -2,196 +2,304 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MÎK AI 🪐</title>
-  <meta name="description" content="MÎK AI — Cosmic Intelligence by Mohammad Israr Khan" />
-  <meta name="theme-color" content="#08080f" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MÎK AI — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:        #04050a;
+      --surface:   #0d0f1a;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #5b8eff;
+      --accent2:   #a78bfa;
+      --text:      #e8eaf0;
+      --muted:     #6b7094;
+      --planet:    #1a1f3a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ── Starfield ── */
+    canvas#stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── Glowing orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.18;
+      pointer-events: none;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 500px; height: 500px; background: #3b5bff; top: -120px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: #8b5cf6; bottom: -100px; right: -80px; animation-delay: -5s; }
+    .orb-3 { width: 300px; height: 300px; background: #06b6d4; bottom: 30%; left: 20%; animation-delay: -9s; }
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px,40px) scale(1.08); }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px 44px;
+      box-shadow:
+        0 0 0 1px rgba(91,142,255,0.08),
+        0 32px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      animation: cardIn 0.7s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(32px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Planet icon ── */
+    .planet-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .planet-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2a3a7a, #0a0e1f);
+      border: 1.5px solid rgba(91,142,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      position: relative;
+      box-shadow: 0 0 24px rgba(91,142,255,0.25), 0 0 60px rgba(91,142,255,0.08);
+      animation: float 5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    .planet-ring {
+      position: absolute;
+      width: 88px;
+      height: 22px;
+      border: 1.5px solid rgba(167,139,250,0.35);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%) rotateX(70deg);
+      pointer-events: none;
+    }
+
+    /* ── Heading ── */
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #e8eaf0 30%, #7ba3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 8px;
+      margin-bottom: 36px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Google Button ── */
+    #googleBtn {
+      width: 100%;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    #googleBtn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(91,142,255,0.12), rgba(167,139,250,0.08));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    #googleBtn:hover { border-color: rgba(91,142,255,0.4); transform: translateY(-1px); }
+    #googleBtn:hover::after { opacity: 1; }
+    #googleBtn:active { transform: translateY(0); }
+    #googleBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .google-logo {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* ── Status / Error ── */
+    #statusMsg {
+      margin-top: 16px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      text-align: center;
+      display: none;
+    }
+    #statusMsg.error   { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #f87171; display: block; }
+    #statusMsg.success { background: rgba(91,142,255,0.1);  border: 1px solid rgba(91,142,255,0.25); color: #93b4ff; display: block; }
+    #statusMsg.loading { background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2); color: #c4b5fd; display: block; }
+
+    /* ── Footer ── */
+    .card-footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .card-footer span {
+      color: rgba(91,142,255,0.7);
+    }
+  </style>
 </head>
 <body>
 
-<!-- ═══ SIDEBAR ═══════════════════════════════════ -->
-<aside id="sidebar" class="sidebar">
-  <div class="sidebar-top">
-    <div class="brand">
-      <span class="brand-saturn">🪐</span>
-      <span class="brand-name">MÎK AI</span>
+  <canvas id="stars"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="card">
+    <div class="planet-wrap">
+      <div class="planet-icon">
+        🪐
+        <div class="planet-ring"></div>
+      </div>
     </div>
-    <button class="icon-btn" id="sidebarClose"><i class="fas fa-times"></i></button>
-  </div>
 
-  <button class="new-chat-btn" id="newChatBtn">
-    <i class="fas fa-plus"></i> New Chat
-  </button>
+    <h1>MÎK AI</h1>
+    <p class="tagline">Your intelligent companion — built in Afghanistan 🇦🇫</p>
 
-  <div class="sidebar-section-label">MODE</div>
-  <div class="mode-pills">
-    <button class="mode-pill active" data-mode="general"><i class="fas fa-star"></i> General</button>
-    <button class="mode-pill" data-mode="islamic"><i class="fas fa-moon"></i> Islamic</button>
-    <button class="mode-pill" data-mode="imagine"><i class="fas fa-image"></i> Imagine</button>
-    <button class="mode-pill" data-mode="quiz"><i class="fas fa-brain"></i> Quiz</button>
-  </div>
+    <div class="divider"><span>continue with</span></div>
 
-  <div class="sidebar-section-label">HISTORY</div>
-  <div id="historyList" class="history-list">
-    <p class="history-empty">No chats yet</p>
-  </div>
-
-  <div class="sidebar-section-label">EARN & UPGRADE</div>
-  <div class="monetize-section">
-    <button class="upgrade-btn" id="upgradeBtn">
-      <i class="fas fa-crown"></i> Go Premium 👑
+    <button id="googleBtn">
+      <!-- Google SVG logo -->
+      <svg class="google-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#EA4335" d="M24 9.5c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 3.1 29.5 1 24 1 14.8 1 7 6.7 3.7 14.6l7 5.4C12.4 14 17.7 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.9z"/>
+        <path fill="#FBBC05" d="M10.7 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7-5.4A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.2-6.1z"/>
+        <path fill="#34A853" d="M24 47c5.4 0 10-1.8 13.3-4.8l-7.4-5.7c-1.8 1.2-4.2 1.9-5.9 1.9-6.3 0-11.6-4.5-13.3-10.5l-8.2 6.1C7 41.3 14.8 47 24 47z"/>
+      </svg>
+      Sign in with Google
     </button>
-    <p class="earn-note">Unlock unlimited chats, no ads & priority AI</p>
+
+    <div id="statusMsg"></div>
+
+    <div class="card-footer">
+      MÎK AI · Built by <span>Mohammad Israr Khan</span> · Afghanistan
+    </div>
   </div>
 
-  <div class="sidebar-bottom">
-    <div class="user-chip">
-      <div class="user-avatar">M</div>
-      <div class="user-meta">
-        <span class="user-name">MÎK 🪐</span>
-        <span class="user-sub">Mohammad Israr Khan</span>
-      </div>
-      <button class="icon-btn" id="settingsBtn"><i class="fas fa-cog"></i></button>
-    </div>
-    <p class="version-tag">MÎK AI v2.0 · Free Plan</p>
-  </div>
-</aside>
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- App logic -->
+  <script src="app.js"></script>
 
-<!-- ═══ MAIN APP ══════════════════════════════════ -->
-<div class="app-shell">
+  <!-- Starfield canvas -->
+  <script>
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() {
+      canvas.width  = innerWidth;
+      canvas.height = innerHeight;
+    }
+    function initStars() {
+      stars = Array.from({ length: 160 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.2 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.003 + 0.001,
+        drift: (Math.random() - 0.5) * 0.08,
+      }));
+    }
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.a += s.speed;
+        s.x += s.drift;
+        if (s.x > canvas.width) s.x = 0;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,210,255,${0.3 + 0.5 * Math.abs(Math.sin(s.a))})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    resize(); initStars(); drawStars();
+  </script>
 
-  <header class="app-header">
-    <button class="icon-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-    <div class="header-brand">
-      <span class="saturn-spin">🪐</span>
-      <span class="header-title">MÎK AI</span>
-      <span id="modeBadge" class="mode-badge general">✦ General</span>
-    </div>
-    <button class="icon-btn" id="newChatHeader"><i class="far fa-edit"></i></button>
-  </header>
-
-  <main class="chat-area" id="chatArea">
-
-    <!-- Welcome -->
-    <div class="welcome-screen" id="welcomeScreen">
-      <div class="welcome-saturn">🪐</div>
-      <h1 class="welcome-title">Bismillah ir-Rahman ir-Rahim</h1>
-      <p class="welcome-sub">As-salamu alaykum, MÎK!<br/>Your cosmic AI is ready.</p>
-      <div class="suggestions">
-        <button class="suggestion-chip" data-q="What is the meaning of Surah Al-Fatiha?">📖 Surah Al-Fatiha</button>
-        <button class="suggestion-chip" data-q="Help me write a professional email">✉️ Write an email</button>
-        <button class="suggestion-chip" data-q="Generate a cosmic galaxy artwork">🎨 Generate art</button>
-        <button class="suggestion-chip" data-q="Give me a quiz about Islamic history">🧠 Islamic quiz</button>
-      </div>
-    </div>
-
-    <!-- Quiz UI -->
-    <div id="quizPanel" class="quiz-panel hidden">
-      <div class="quiz-box">
-        <div class="quiz-header">
-          <span>🧠 MÎK Quiz</span>
-          <button class="icon-btn" id="closeQuiz"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="quizQuestion" class="quiz-question">Loading question...</div>
-        <div id="quizOptions" class="quiz-options"></div>
-        <div id="quizResult" class="quiz-result hidden"></div>
-        <button class="quiz-next-btn hidden" id="quizNextBtn">Next Question ➤</button>
-      </div>
-    </div>
-
-    <div id="messageFlow" class="message-flow"></div>
-  </main>
-
-  <!-- Input -->
-  <div class="input-zone">
-
-    <!-- Ad Banner (Monetization) -->
-    <div id="adBanner" class="ad-banner hidden">
-      <span>✨ MÎK AI Premium — Unlimited chats, no ads</span>
-      <button id="adUpgradeBtn" class="ad-upgrade-btn">Upgrade 👑</button>
-      <button id="adClose" class="ad-close"><i class="fas fa-times"></i></button>
-    </div>
-
-    <div class="input-bar">
-      <button class="icon-btn" id="voiceRoomBtn" title="Voice Room"><i class="fas fa-microphone-lines"></i></button>
-      <button class="icon-btn" id="uploadBtn" title="Upload file"><i class="fas fa-paperclip"></i></button>
-      <button class="icon-btn" id="cameraBtn" title="Camera"><i class="fas fa-camera"></i></button>
-      <textarea id="userInput" placeholder="Message MÎK AI..." rows="1"></textarea>
-      <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-    </div>
-
-    <!-- Hidden inputs -->
-    <input type="file" id="fileInput" accept="*/*" style="display:none" />
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" />
-
-    <p class="input-footer">MÎK AI 🪐 · Enter to send · Shift+Enter new line</p>
-  </div>
-</div>
-
-<!-- ═══ PREMIUM MODAL ═════════════════════════════ -->
-<div id="premiumModal" class="modal-overlay hidden">
-  <div class="modal-box premium-modal">
-    <div class="modal-header">
-      <h3>👑 MÎK AI Premium</h3>
-      <button class="icon-btn" id="closePremium"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="premium-plans">
-      <div class="plan-card">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0</div>
-        <ul class="plan-features">
-          <li>✓ 20 messages/day</li>
-          <li>✓ General & Islamic mode</li>
-          <li>✓ Image generation</li>
-          <li>✗ Voice room</li>
-          <li>✗ File uploads</li>
-        </ul>
-      </div>
-      <div class="plan-card premium">
-        <div class="plan-badge">BEST 🔥</div>
-        <div class="plan-name">Premium</div>
-        <div class="plan-price">$4.99<span>/mo</span></div>
-        <ul class="plan-features">
-          <li>✓ Unlimited messages</li>
-          <li>✓ All modes + Quiz</li>
-          <li>✓ Voice room</li>
-          <li>✓ File uploads</li>
-          <li>✓ No ads</li>
-          <li>✓ Priority AI</li>
-        </ul>
-        <button class="get-premium-btn" id="getPremiumBtn">Get Premium 👑</button>
-      </div>
-    </div>
-    <p class="setting-note">Payments via Stripe — coming soon Insha'Allah 🪐</p>
-  </div>
-</div>
-
-<!-- ═══ SETTINGS MODAL ════════════════════════════ -->
-<div id="settingsModal" class="modal-overlay hidden">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3>⚙️ Settings</h3>
-      <button class="icon-btn" id="closeSettings"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="setting-row">
-      <span>Theme</span>
-      <button id="themeToggle" class="mini-btn">Toggle Light / Dark</button>
-    </div>
-    <div class="setting-row">
-      <span>Clear History</span>
-      <button id="clearHistory" class="mini-btn danger">Clear All</button>
-    </div>
-    <p class="setting-note">MÎK AI v2.0 · Built by MÎK 🪐</p>
-  </div>
-</div>
-
-<script src="app.js"></script>
 </body>
 </html>
