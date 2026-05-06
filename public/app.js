@@ -13,7 +13,7 @@ const FIREBASE_CONFIG = {
   appId:             "1:382112001405:web:c7bfe1fb6a2f897a097014",
 };
 
-const BACKEND_URL = "https://mik-ai-backend-production.up.railway.app";
+const BACKEND_URL = "https://mik-ai-backend.onrender.com";
 
 // ── Init Firebase ────────────────────────────────────────────
 firebase.initializeApp(FIREBASE_CONFIG);
