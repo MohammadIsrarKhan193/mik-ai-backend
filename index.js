@@ -24,11 +24,17 @@ app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 
 // ── Firebase Admin Init ───────────────────────
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-} else {
-  console.warn("⚠️ No Firebase service account found!");
+try {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+    const serviceAccount = JSON.parse(raw);
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    console.log("✅ Firebase initialized!");
+  } else {
+    console.warn("⚠️ No Firebase service account!");
+  }
+} catch(e) {
+  console.error("❌ Firebase init error:", e.message);
 }
 
 // ── Groq Init ─────────────────────────────────
