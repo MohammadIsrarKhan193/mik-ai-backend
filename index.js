@@ -25,9 +25,10 @@ app.use("/uploads", express.static("uploads"));
 
 // ── Firebase Admin Init ───────────────────────
 try {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-    const serviceAccount = JSON.parse(raw);
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (raw) {
+    const fixed = raw.replace(/\\n/g, '\n');
+    const serviceAccount = JSON.parse(fixed);
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
     console.log("✅ Firebase initialized!");
   } else {
