@@ -26,13 +26,16 @@ app.use("/uploads", express.static("uploads"));
 // ── Firebase Admin Init ───────────────────────
 try {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (raw) {
-    const fixed = raw.replace(/\\n/g, '\n');
-    const serviceAccount = JSON.parse(fixed);
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-    console.log("✅ Firebase initialized!");
+  if (raw && raw.trim().startsWith("{")) {
+    const serviceAccount = JSON.parse(
+      raw.replace(/\\n/g, "\n")
+    );
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("✅ Firebase initialized successfully!");
   } else {
-    console.warn("⚠️ No Firebase service account!");
+    console.error("❌ FIREBASE_SERVICE_ACCOUNT is missing or invalid!");
   }
 } catch(e) {
   console.error("❌ Firebase init error:", e.message);
