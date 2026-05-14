@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MÎK AI — Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- AdMob Web (only shows in Android WebView / TWA) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg:      #04050a; --surface: #0d0f1a; --surface2: #12152a;
+      --border:  rgba(255,255,255,0.07); --accent: #5b8eff; --accent2: #a78bfa;
+      --text:    #e8eaf0; --muted:   #6b7094; --danger: #f87171;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+    /* ── Orbs ── */
+    .orb { position:fixed; border-radius:50%; filter:blur(90px); opacity:0.12; pointer-events:none; }
+    .orb-1 { width:400px; height:400px; background:#3b5bff; top:-100px; right:-80px; }
+    .orb-2 { width:300px; height:300px; background:#8b5cf6; bottom:-80px; left:-60px; }
+
+    /* ── Layout ── */
+    .page { max-width:600px; margin:0 auto; padding:24px 16px 80px; position:relative; z-index:1; }
+
+    /* ── Top bar ── */
+    .topbar {
+      display:flex; align-items:center; gap:12px;
+      padding:16px 0 24px;
+    }
+    .back-btn {
+      width:38px; height:38px; border-radius:10px;
+      background:var(--surface); border:1px solid var(--border);
+      color:var(--text); cursor:pointer; font-size:16px;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .2s;
+    }
+    .back-btn:hover { background:var(--surface2); }
+    .topbar h2 { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; flex:1; }
+
+    /* ── Profile card ── */
+    .profile-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:20px; padding:28px 24px; margin-bottom:20px;
+      display:flex; align-items:center; gap:20px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+    }
+    .avatar-wrap { position:relative; flex-shrink:0; }
+    .avatar {
+      width:72px; height:72px; border-radius:50%;
+      border:2px solid var(--accent); object-fit:cover;
+    }
+    .avatar-fallback {
+      width:72px; height:72px; border-radius:50%;
+      background:linear-gradient(135deg,#2a3a7a,#1a0e3a);
+      border:2px solid var(--accent);
+      display:flex; align-items:center; justify-content:center;
+      font-size:28px;
+    }
+    .online-dot {
+      position:absolute; bottom:3px; right:3px;
+      width:14px; height:14px; border-radius:50%;
+      background:#22c55e; border:2px solid var(--bg);
+    }
+    .profile-info h3 { font-family:'Syne',sans-serif; font-size:1.15rem; font-weight:700; }
+    .profile-info p  { color:var(--muted); font-size:.85rem; margin-top:4px; }
+    .profile-info .uid { font-size:.72rem; color:var(--muted); margin-top:6px; opacity:.6; font-family:monospace; }
+
+    /* ── Stats row ── */
+    .stats-row {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px;
+    }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:16px 12px; text-align:center;
+    }
+    .stat-num { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--accent); }
+    .stat-lbl { font-size:.72rem; color:var(--muted); margin-top:2px; }
+
+    /* ── AdMob banner placeholder ── */
+    .admob-banner {
+      width:100%; background:var(--surface); border:1px dashed rgba(91,142,255,0.2);
+      border-radius:12px; min-height:60px; display:flex;
+      align-items:center; justify-content:center;
+      color:var(--muted); font-size:.75rem; margin-bottom:20px;
+      overflow:hidden;
+    }
+
+    /* ── Section ── */
+    .section-label {
+      font-size:.72rem; color:var(--muted); letter-spacing:.1em;
+      text-transform:uppercase; margin-bottom:10px; margin-top:4px;
+    }
+
+    /* ── History list ── */
+    .history-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .history-item {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:14px 16px; cursor:pointer;
+      transition:border-color .2s, background .2s;
+      display:flex; align-items:flex-start; gap:12px;
+    }
+    .history-item:hover { border-color:rgba(91,142,255,0.3); background:var(--surface2); }
+    .history-icon { font-size:18px; flex-shrink:0; margin-top:2px; }
+    .history-body { flex:1; min-width:0; }
+    .history-title { font-size:.9rem; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .history-meta  { font-size:.75rem; color:var(--muted); margin-top:3px; }
+    .history-del {
+      background:none; border:none; color:var(--muted); cursor:pointer;
+      font-size:14px; padding:4px; border-radius:6px; transition:color .2s;
+      flex-shrink:0;
+    }
+    .history-del:hover { color:var(--danger); }
+
+    .empty-state {
+      text-align:center; padding:40px 20px; color:var(--muted); font-size:.9rem;
+    }
+    .empty-state .e-icon { font-size:36px; margin-bottom:12px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      width:100%; padding:13px; border-radius:12px; font-family:'DM Sans',sans-serif;
+      font-size:.9rem; font-weight:500; cursor:pointer; border:none; transition:.2s;
+    }
+    .btn-danger  { background:rgba(239,68,68,.1); color:var(--danger); border:1px solid rgba(239,68,68,.2); }
+    .btn-danger:hover { background:rgba(239,68,68,.18); }
+    .btn-outline { background:var(--surface); color:var(--text); border:1px solid var(--border); margin-bottom:10px; }
+    .btn-outline:hover { border-color:rgba(91,142,255,.4); }
+
+    .loading-text { text-align:center; color:var(--muted); padding:20px; }
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.15); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page">
+    <div class="topbar">
+      <button class="back-btn" onclick="history.back()">←</button>
+      <h2>🪐 My Profile</h2>
+    </div>
+
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="avatar-wrap">
+        <div id="avatarEl" class="avatar-fallback">🪐</div>
+        <div class="online-dot"></div>
+      </div>
+      <div class="profile-info">
+        <h3 id="userName">Loading…</h3>
+        <p  id="userEmail"></p>
+        <p  id="userId" class="uid"></p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statChats">—</div><div class="stat-lbl">Chats</div></div>
+      <div class="stat-card"><div class="stat-num" id="statMsgs">—</div><div class="stat-lbl">Messages</div></div>
+      <div class="stat-card"><div class="stat-num" id="statDays">—</div><div class="stat-lbl">Days Active</div></div>
+    </div>
+
+    <!-- AdMob Banner -->
+    <div class="admob-banner">
+      <!-- Replace data-ad-* values with your real AdMob unit IDs -->
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;height:60px;"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="XXXXXXXXXX"
+           data-ad-format="banner"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <!-- Chat History -->
+    <p class="section-label">Cloud Chat History</p>
+    <div id="historyList" class="history-list">
+      <div class="loading-text"><span class="spinner"></span> Loading history…</div>
+    </div>
+
+    <button class="btn btn-outline" onclick="loadHistory()">🔄 Refresh History</button>
+    <button class="btn btn-danger"  onclick="confirmLogout()">🚪 Sign Out</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script>
+    const BACKEND = "https://mik-ai-backend-production.up.railway.app";
+    const FIREBASE_CONFIG = {
+      apiKey:"AIzaSyB7gnDvk6rKJPLj-h7ykU6hcWM1YuGqrZQ",
+      authDomain:"mik-ai-app.firebaseapp.com",
+      projectId:"mik-ai-app",
+      storageBucket:"mik-ai-app.firebasestorage.app",
+      messagingSenderId:"382112001405",
+      appId:"1:382112001405:web:c7bfe1fb6a2f897a097014"
+    };
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const auth = firebase.auth();
+
+    // ── Auth guard ────────────────────────────────────────────
+    const token = localStorage.getItem("mik_token");
+    if (!token) window.location.href = "login.html";
+
+    // ── Populate profile ──────────────────────────────────────
+    const userRaw = localStorage.getItem("mik_user");
+    if (userRaw) {
+      const u = JSON.parse(userRaw);
+      document.getElementById("userName").textContent  = u.name  || "MÎK User";
+      document.getElementById("userEmail").textContent = u.email || "";
+      document.getElementById("userId").textContent    = "UID: " + (u.uid || "");
+      if (u.photo) {
+        const img = document.createElement("img");
+        img.src = u.photo; img.className = "avatar"; img.alt = "avatar";
+        document.getElementById("avatarEl").replaceWith(img);
+      }
+    }
+
+    // ── Load cloud history ────────────────────────────────────
+    async function loadHistory() {
+      const list = document.getElementById("historyList");
+      list.innerHTML = `<div class="loading-text"><span class="spinner"></span> Loading…</div>`;
+      try {
+        const res  = await fetch(`${BACKEND}/history`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json(); // expects { history: [...], stats: {...} }
+
+        // Stats
+        if (data.stats) {
+          document.getElementById("statChats").textContent = data.stats.totalChats || 0;
+          document.getElementById("statMsgs").textContent  = data.stats.totalMessages || 0;
+          document.getElementById("statDays").textContent  = data.stats.daysActive || 1;
+        }
+
+        // History items
+        if (!data.history || data.history.length === 0) {
+          list.innerHTML = `<div class="empty-state"><div class="e-icon">💬</div>No chats saved yet.<br>Start chatting to build your history!</div>`;
+          return;
+        }
+        list.innerHTML = "";
+        data.history.forEach(item => {
+          const modeIcon = { general:"💬", islamic:"🕌", image:"🎨", quiz:"🎯" }[item.mode] || "💬";
+          const date = new Date(item.createdAt).toLocaleDateString("en-US", { month:"short", day:"numeric" });
+          const el = document.createElement("div");
+          el.className = "history-item";
+          el.innerHTML = `
+            <span class="history-icon">${modeIcon}</span>
+            <div class="history-body">
+              <div class="history-title">${escHtml(item.title || item.lastMessage || "Untitled chat")}</div>
+              <div class="history-meta">${date} · ${item.messageCount || 0} messages · ${item.mode || "general"}</div>
+            </div>
+            <button class="history-del" onclick="deleteChat('${item._id}', this)" title="Delete">🗑</button>
+          `;
+          el.addEventListener("click", (e) => {
+            if (e.target.classList.contains("history-del")) return;
+            window.location.href = `index.html?chatId=${item._id}`;
+          });
+          list.appendChild(el);
+        });
+      } catch (err) {
+        list.innerHTML = `<div class="empty-state"><div class="e-icon">⚠️</div>${err.message}</div>`;
+      }
+    }
+
+    async function deleteChat(id, btn) {
+      if (!confirm("Delete this chat?")) return;
+      btn.textContent = "…";
+      try {
+        await fetch(`${BACKEND}/history/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        btn.closest(".history-item").remove();
+      } catch (e) {
+        btn.textContent = "🗑";
+        alert("Failed to delete. Try again.");
+      }
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    function confirmLogout() {
+      if (confirm("Sign out of MÎK AI?")) {
+        auth.signOut().then(() => {
+          localStorage.removeItem("mik_token");
+          localStorage.removeItem("mik_user");
+          window.location.href = "login.html";
+        });
+      }
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>
