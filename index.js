@@ -1,229 +1,166 @@
-/* ═══════════════════════════════════════════════
-   MÎK AI — index.js v3.0 🪐
-   By Mohammad Israr Khan
-═══════════════════════════════════════════════ */
+// ============================================================
+//  MÎK AI — index.js  (Node.js / Railway Backend)
+//  Firebase Auth + Cloud Chat History + Groq AI
+//  Built by Mohammad Israr Khan (Afghanistan) 🪐
+// ============================================================
 
-import express from "express";
-import Groq from "groq-sdk";
-import cors from "cors";
-import multer from "multer";
-import fetch from "node-fetch";
-import { config } from "dotenv";
-import admin from "firebase-admin";
-import jwt from "jsonwebtoken";
-config();
+const express   = require("express");
+const cors      = require("cors");
+const admin     = require("firebase-admin");
+const jwt       = require("jsonwebtoken");
+const mongoose  = require("mongoose");
+const Groq      = require("groq-sdk");
+require("dotenv").config();
 
-const app = express();
-const upload = multer({ dest: "uploads/", limits: { fileSize: 10 * 1024 * 1024 } });
+const app  = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || "mik-ai-secret-2026";
 
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL || "*", methods: ["GET","POST","DELETE","OPTIONS"], allowedHeaders: ["Content-Type","Authorization"] }));
 app.use(express.json());
 app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
 
-// ── Firebase Admin Init ───────────────────────
-try {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (raw && raw.trim().startsWith("{")) {
-    const serviceAccount = JSON.parse(
-      raw.replace(/\\n/g, "\n")
-    );
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-    console.log("✅ Firebase initialized successfully!");
-  } else {
-    console.error("❌ FIREBASE_SERVICE_ACCOUNT is missing or invalid!");
-  }
-} catch(e) {
-  console.error("❌ Firebase init error:", e.message);
-}
+// Firebase Admin
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  : require("./serviceAccountKey.json");
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
-// ── Groq Init ─────────────────────────────────
+// Groq
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const chatHistory = {};
 
-// ── System Prompts ────────────────────────────
-const GENERAL_PROMPT = `You are MÎK AI 🪐 — a powerful, cosmic AI assistant created by Mohammad Israr Khan (MÎK). You are smart, helpful, friendly, and cosmic in personality.
-IMPORTANT: Always reply in the SAME language the user writes in. Auto-detect and match language every time.
-Help with anything: coding, writing, ideas, analysis, and more.`;
-
-const ISLAMIC_PROMPT = `You are MÎK AI 🪐 in Islamic Mode — a knowledgeable Islamic assistant created by Mohammad Israr Khan (MÎK).
-IMPORTANT: Always reply in the SAME language the user writes in. Auto-detect and match language every time.
-You specialize in Quran tafsir, Hadith, Fiqh, Islamic history, duas, and practical Islamic guidance. Use Islamic etiquette naturally. Always recommend consulting a qualified scholar for personal fatwas.`;
-
-const QUIZ_PROMPT = `You are MÎK AI 🪐 in Quiz Mode. Generate a fun quiz question with 4 options (A, B, C, D).
-Format EXACTLY like this:
-QUESTION: [question]
-A) [option]
-B) [option]
-C) [option]
-D) [option]
-ANSWER: [correct letter]
-EXPLANATION: [brief explanation]`;
-
-const VOICE_PROMPT = `You are MÎK AI in voice mode. Give SHORT conversational answers. Max 2-3 sentences. No markdown, no bullets, no emojis. Natural speech only. Match user language.`;
-
-// ── Keywords ──────────────────────────────────
-const IMAGE_KEYWORDS = ["create", "generate", "draw", "imagine", "picture", "image", "pic", "design", "paint", "بنا", "تصویر", "جنریٹ"];
-const LOGO_KEYWORDS  = ["icon", "logo", "app icon", "brand", "symbol", "badge"];
-const isImageRequest = (t) => IMAGE_KEYWORDS.some(k => t.toLowerCase().includes(k));
-const isLogoRequest  = (t) => LOGO_KEYWORDS.some(k => t.toLowerCase().includes(k));
-
-// ── Auth Middleware ───────────────────────────
-function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing auth token." });
-  }
-  try {
-    req.user = jwt.verify(header.slice(7), JWT_SECRET);
-    next();
-  } catch {
-    return res.status(401).json({ message: "Token invalid or expired." });
-  }
+// MongoDB
+if (process.env.MONGO_URI) {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ MongoDB connected"))
+    .catch(e  => console.error("❌ MongoDB:", e.message));
 }
 
-// ── POST /auth/google ─────────────────────────
+// Schemas
+const Chat = mongoose.model("Chat", new mongoose.Schema({
+  uid:          { type:String, required:true, index:true },
+  title:        { type:String, default:"New Chat" },
+  mode:         { type:String, default:"general" },
+  messages:     [{ role:{ type:String, enum:["user","assistant"] }, content:String, _id:false }],
+  lastMessage:  String,
+  messageCount: { type:Number, default:0 },
+  createdAt:    { type:Date, default:Date.now },
+  updatedAt:    { type:Date, default:Date.now },
+}));
+
+const UserStats = mongoose.model("UserStats", new mongoose.Schema({
+  uid:           { type:String, required:true, unique:true },
+  totalMessages: { type:Number, default:0 },
+  firstSeen:     { type:Date,   default:Date.now },
+  lastSeen:      { type:Date,   default:Date.now },
+}));
+
+// JWT
+const JWT_SECRET  = process.env.JWT_SECRET  || "mik-ai-secret-change-me";
+const JWT_EXPIRES = process.env.JWT_EXPIRES || "7d";
+
+function requireAuth(req, res, next) {
+  const h = req.headers.authorization;
+  if (!h?.startsWith("Bearer ")) return res.status(401).json({ message:"Missing token." });
+  try { req.user = jwt.verify(h.slice(7), JWT_SECRET); next(); }
+  catch { return res.status(401).json({ message:"Token invalid." }); }
+}
+
+// Health
+app.get("/health", (_,res) => res.json({ status:"🪐 MÎK AI live", version:"2.0.0" }));
+
+// POST /auth/google
 app.post("/auth/google", async (req, res) => {
   const { idToken } = req.body;
-  if (!idToken) return res.status(400).json({ message: "idToken required." });
+  if (!idToken) return res.status(400).json({ message:"idToken required." });
   try {
-    const decoded = await admin.auth().verifyIdToken(idToken);
-    const user = {
-      uid:   decoded.uid,
-      name:  decoded.name    || "MÎK User",
-      email: decoded.email   || "",
-      photo: decoded.picture || "",
-    };
-    const token = jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
-    console.log(`✅ User signed in: ${user.email}`);
-    res.json({ success: true, token, user });
-  } catch (err) {
-    console.error("Token verification failed:", err.message);
-    res.status(401).json({ message: "Invalid or expired token." });
+    const d = await admin.auth().verifyIdToken(idToken);
+    const user = { uid:d.uid, name:d.name||"MÎK User", email:d.email||"", photo:d.picture||"" };
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn:JWT_EXPIRES });
+    await UserStats.findOneAndUpdate({ uid:user.uid }, { $set:{ lastSeen:new Date() }, $setOnInsert:{ firstSeen:new Date() } }, { upsert:true });
+    console.log("✅ Auth:", user.email);
+    return res.json({ success:true, token, user });
+  } catch(err) {
+    return res.status(401).json({ message:"Invalid token." });
   }
 });
 
-// ── GET /me ───────────────────────────────────
-app.get("/me", requireAuth, (req, res) => {
-  res.json({ user: req.user });
-});
+// GET /me
+app.get("/me", requireAuth, (req,res) => res.json({ user:req.user }));
 
-// ── POST /chat ────────────────────────────────
-app.post("/chat", async (req, res) => {
+// POST /chat
+app.post("/chat", requireAuth, async (req, res) => {
+  const { message, mode="general", chatId, history=[] } = req.body;
+  if (!message) return res.status(400).json({ message:"message required." });
+
+  const systemPrompts = {
+    general: "You are MÎK AI, a helpful and friendly assistant created by Mohammad Israr Khan from Afghanistan. Be concise and helpful.",
+    islamic: "You are MÎK AI in Islamic Mode. Answer questions about Islam with care and accuracy. Cite Quran/Hadith where relevant. Start with Bismillah.",
+    image:   "You are MÎK AI. Help the user craft vivid image generation prompts. Be descriptive and creative.",
+    quiz:    "You are MÎK AI Quiz Master. Generate multiple-choice questions on the topic given. Format: Question, A/B/C/D options, then the correct answer.",
+  };
+
   try {
-    const { message, userId, mode } = req.body;
-    if (!message?.trim()) return res.status(400).json({ reply: "Please send a valid message." });
-
-    const id = userId || "guest";
-    const trimmed = message.trim();
-
-    // Image generation
-    if (isImageRequest(trimmed) || mode === "imagine") {
-      if (isLogoRequest(trimmed)) {
-        return res.json({ reply: `I can't generate logos accurately! 🪐\n\nTry:\n- **[Canva.com](https://canva.com)** — free & easy\n- **[Looka.com](https://looka.com)** — AI logo maker` });
-      }
-      const encodedPrompt = encodeURIComponent(trimmed);
-      return res.json({ reply: `IMAGE_GEN:/generate-image?prompt=${encodedPrompt}` });
-    }
-
-    // Quiz mode
-    if (mode === "quiz") {
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
-        messages: [{ role: "system", content: QUIZ_PROMPT }, { role: "user", content: trimmed }],
-        temperature: 0.8, max_tokens: 300
-      });
-      return res.json({ reply: completion.choices[0]?.message?.content, type: "quiz" });
-    }
-
-    // Normal chat
-    if (!chatHistory[id]) chatHistory[id] = [];
-    const systemPrompt = mode === "islamic" ? ISLAMIC_PROMPT : GENERAL_PROMPT;
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
-      messages: [{ role: "system", content: systemPrompt }, ...chatHistory[id], { role: "user", content: trimmed }],
-      temperature: 0.7, max_tokens: 1024
+      messages: [
+        { role:"system", content: systemPrompts[mode] || systemPrompts.general },
+        ...history.slice(-10),
+        { role:"user", content: message },
+      ],
+      max_tokens: 1024, temperature: 0.7,
     });
+
     const reply = completion.choices[0]?.message?.content || "No response.";
-    chatHistory[id].push({ role: "user", content: trimmed }, { role: "assistant", content: reply });
-    if (chatHistory[id].length > 20) chatHistory[id] = chatHistory[id].slice(-20);
-    res.json({ reply });
 
-  } catch (error) {
-    console.error("MÎK AI Error:", error?.message);
-    res.status(500).json({ reply: "MÎK AI is busy! Try again 🪐" });
+    let savedChatId = chatId;
+    if (mongoose.connection.readyState === 1) {
+      let chat = chatId ? await Chat.findOne({ _id:chatId, uid:req.user.uid }) : null;
+      if (!chat) chat = new Chat({ uid:req.user.uid, mode, title:message.slice(0,60) });
+      chat.messages.push({ role:"user", content:message });
+      chat.messages.push({ role:"assistant", content:reply });
+      chat.lastMessage  = reply.slice(0,100);
+      chat.messageCount = chat.messages.length;
+      chat.updatedAt    = new Date();
+      await chat.save();
+      savedChatId = chat._id;
+      await UserStats.findOneAndUpdate({ uid:req.user.uid }, { $inc:{ totalMessages:1 }, $set:{ lastSeen:new Date() } });
+    }
+
+    return res.json({ reply, chatId:savedChatId });
+  } catch(err) {
+    console.error("Groq error:", err.message);
+    return res.status(500).json({ message:"AI error. Try again." });
   }
 });
 
-// ── GET /generate-image ───────────────────────
-app.get("/generate-image", async (req, res) => {
+// GET /history
+app.get("/history", requireAuth, async (req, res) => {
+  if (mongoose.connection.readyState !== 1) return res.json({ history:[], stats:{ totalChats:0, totalMessages:0, daysActive:1 } });
   try {
-    const { prompt } = req.query;
-    if (!prompt) return res.status(400).json({ error: "No prompt" });
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${Math.floor(Math.random() * 9999)}&nologo=true&enhance=true`;
-    const response = await fetch(imageUrl, { timeout: 30000 });
-    if (!response.ok) throw new Error("Image fetch failed");
-    res.setHeader("Content-Type", "image/jpeg");
-    res.setHeader("Cache-Control", "public, max-age=86400");
-    response.body.pipe(res);
-  } catch (e) {
-    res.status(500).json({ error: "Image generation failed" });
-  }
+    const [history, stats] = await Promise.all([
+      Chat.find({ uid:req.user.uid }).sort({ updatedAt:-1 }).limit(50).select("-messages"),
+      UserStats.findOne({ uid:req.user.uid }),
+    ]);
+    const daysActive = stats?.firstSeen ? Math.max(1, Math.ceil((Date.now()-new Date(stats.firstSeen))/86400000)) : 1;
+    return res.json({ history, stats:{ totalChats:history.length, totalMessages:stats?.totalMessages||0, daysActive } });
+  } catch(err) { return res.status(500).json({ message:err.message }); }
 });
 
-// ── POST /speak ───────────────────────────────
-app.post("/speak", async (req, res) => {
+// GET /history/:id
+app.get("/history/:id", requireAuth, async (req, res) => {
   try {
-    const { text } = req.body;
-    if (!text) return res.status(400).json({ error: "No text" });
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "system", content: VOICE_PROMPT }, { role: "user", content: text }],
-      max_tokens: 150, temperature: 0.7
-    });
-    res.json({ reply: completion.choices[0]?.message?.content });
-  } catch (e) {
-    res.status(500).json({ error: "Voice error" });
-  }
+    const chat = await Chat.findOne({ _id:req.params.id, uid:req.user.uid });
+    if (!chat) return res.status(404).json({ message:"Not found." });
+    return res.json({ chat });
+  } catch(err) { return res.status(500).json({ message:err.message }); }
 });
 
-// ── POST /upload ──────────────────────────────
-app.post("/upload", upload.single("file"), async (req, res) => {
+// DELETE /history/:id
+app.delete("/history/:id", requireAuth, async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "No file" });
-    const isImage = req.file.mimetype.startsWith("image/");
-    const aiComment = isImage
-      ? `I can see you uploaded: **${req.file.originalname}** Masha'Allah! 🪐`
-      : `File received: **${req.file.originalname}** (${(req.file.size/1024).toFixed(1)}KB) 🪐`;
-    res.json({ fileUrl: `/uploads/${req.file.filename}`, aiComment });
-  } catch (e) {
-    res.status(500).json({ error: "Upload failed" });
-  }
+    await Chat.deleteOne({ _id:req.params.id, uid:req.user.uid });
+    return res.json({ success:true });
+  } catch(err) { return res.status(500).json({ message:err.message }); }
 });
 
-// ── POST /quiz ────────────────────────────────
-app.post("/quiz", async (req, res) => {
-  try {
-    const { topic } = req.body;
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "system", content: QUIZ_PROMPT }, { role: "user", content: `Quiz about: ${topic || "general knowledge"}` }],
-      temperature: 0.8, max_tokens: 300
-    });
-    res.json({ quiz: completion.choices[0]?.message?.content });
-  } catch (e) {
-    res.status(500).json({ error: "Quiz failed" });
-  }
-});
-
-// ── GET /health ───────────────────────────────
-app.get("/health", (_req, res) => {
-  res.json({ status: "online", name: "MÎK AI 🪐", version: "3.0" });
-});
-
-// ── Start ─────────────────────────────────────
-app.listen(PORT, () => console.log(`🚀 MÎK AI v3.0 online — Port ${PORT}`));
+app.listen(PORT, () => console.log(`🪐 MÎK AI backend on port ${PORT}`));
