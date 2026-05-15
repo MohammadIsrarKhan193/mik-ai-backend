@@ -1,6 +1,5 @@
 // ============================================================
-//  MÎK AI — app.js  (Firebase Auth — Mobile-Safe FIXED)
-//  Uses signInWithRedirect (fixes sessionStorage error on mobile)
+//  MÎK AI — app.js  (FIXED v3 — bulletproof mobile auth)
 //  Built by Mohammad Israr Khan (Afghanistan) 🪐
 // ============================================================
 
@@ -15,114 +14,137 @@ const FIREBASE_CONFIG = {
 
 const BACKEND_URL = "https://mik-ai-backend-production.up.railway.app";
 
-// ── Init Firebase ─────────────────────────────────────────────
-firebase.initializeApp(FIREBASE_CONFIG);
-const auth     = firebase.auth();
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
+// ── Wait for full page load before doing ANYTHING ────────────
+window.addEventListener("load", function () {
 
-// ── DOM refs ──────────────────────────────────────────────────
-const googleBtn = document.getElementById("googleBtn");
-const statusMsg = document.getElementById("statusMsg");
+  // ── Init Firebase ────────────────────────────────────────
+  firebase.initializeApp(FIREBASE_CONFIG);
+  const auth     = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
 
-// ── Helpers ───────────────────────────────────────────────────
-function showStatus(msg, type = "loading") {
-  statusMsg.innerHTML = type === "loading"
-    ? `<span class="spinner"></span>${msg}` : msg;
-  statusMsg.className = type;
-}
-function clearStatus() { statusMsg.textContent = ""; statusMsg.className = ""; }
+  // ── DOM refs ─────────────────────────────────────────────
+  const googleBtn = document.getElementById("googleBtn");
+  const statusMsg = document.getElementById("statusMsg");
 
-const GOOGLE_SVG = `<svg class="google-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#EA4335" d="M24 9.5c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 3.1 29.5 1 24 1 14.8 1 7 6.7 3.7 14.6l7 5.4C12.4 14 17.7 9.5 24 9.5z"/>
-  <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.9z"/>
-  <path fill="#FBBC05" d="M10.7 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7-5.4A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.2-6.1z"/>
-  <path fill="#34A853" d="M24 47c5.4 0 10-1.8 13.3-4.8l-7.4-5.7c-1.8 1.2-4.2 1.9-5.9 1.9-6.3 0-11.6-4.5-13.3-10.5l-8.2 6.1C7 41.3 14.8 47 24 47z"/>
-</svg> Sign in with Google`;
-
-function setButtonLoading(loading) {
-  googleBtn.disabled  = loading;
-  googleBtn.innerHTML = loading
-    ? `<span class="spinner"></span> Signing in…`
-    : GOOGLE_SVG;
-}
-
-// ── Send Firebase token to backend ────────────────────────────
-async function authenticateWithBackend(idToken) {
-  const res = await fetch(`${BACKEND_URL}/auth/google`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ idToken }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `Server error ${res.status}`);
+  // ── Helpers ──────────────────────────────────────────────
+  function showStatus(msg, type) {
+    if (!statusMsg) return;
+    statusMsg.textContent = msg;
+    statusMsg.className   = type || "loading";
+    statusMsg.style.display = "block";
   }
-  return res.json();
-}
 
-// ── Save session ──────────────────────────────────────────────
-function saveSession(data, firebaseUser) {
-  if (data.token) localStorage.setItem("mik_token", data.token);
-  localStorage.setItem("mik_user", JSON.stringify({
-    uid:   firebaseUser.uid,
-    name:  firebaseUser.displayName,
-    email: firebaseUser.email,
-    photo: firebaseUser.photoURL,
-  }));
-}
+  function setLoading(on) {
+    if (!googleBtn) return;
+    googleBtn.disabled     = on;
+    googleBtn.textContent  = on ? "Signing in…" : "Sign in with Google";
+  }
 
-// ── STEP 1: Button → redirect to Google ──────────────────────
-// KEY FIX: signInWithRedirect works on ALL mobile browsers.
-// signInWithPopup fails on mobile Chrome with "sessionStorage missing" error.
-googleBtn.addEventListener("click", () => {
-  setButtonLoading(true);
-  showStatus("Redirecting to Google…", "loading");
-  auth.signInWithRedirect(provider);
-});
+  // ── Send Firebase token → Railway backend ─────────────────
+  async function authenticateWithBackend(idToken) {
+    const res = await fetch(BACKEND_URL + "/auth/google", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ idToken: idToken }),
+    });
+    if (!res.ok) throw new Error("Backend error " + res.status);
+    return res.json();
+  }
 
-// ── STEP 2: After redirect returns → handle result ────────────
-// getRedirectResult() must be called on every page load.
-// It resolves with user data ONLY when returning from Google redirect.
-auth.getRedirectResult()
-  .then(async (result) => {
-    if (!result || !result.user) return; // Normal page load, skip
-
-    const user = result.user;
-    setButtonLoading(true);
-    showStatus("Verifying with MÎK AI server…", "loading");
-
-    const idToken = await user.getIdToken();
-    const data    = await authenticateWithBackend(idToken);
-    saveSession(data, user);
-
-    showStatus(`Welcome, ${user.displayName?.split(" ")[0] || "friend"}! 🪐`, "success");
-    setTimeout(() => { window.location.href = "index.html"; }, 1000);
-  })
-  .catch((err) => {
-    console.error("[MÎK AI] Auth error:", err);
-    showStatus(err.message || "Sign-in failed. Please try again.", "error");
-    setButtonLoading(false);
-  });
-
-// ── STEP 3: Already authenticated → skip login page ──────────
-auth.onAuthStateChanged(async (user) => {
-  if (user && localStorage.getItem("mik_token")) {
+  // ── Save session ──────────────────────────────────────────
+  function saveSession(data, firebaseUser) {
     try {
-      const idToken = await user.getIdToken(true);
-      const data    = await authenticateWithBackend(idToken);
-      saveSession(data, user);
-    } catch (e) {
-      console.warn("[MÎK AI] Token refresh failed, continuing anyway:", e.message);
+      if (data && data.token) localStorage.setItem("mik_token", data.token);
+      localStorage.setItem("mik_user", JSON.stringify({
+        uid:   firebaseUser.uid,
+        name:  firebaseUser.displayName  || "MÎK User",
+        email: firebaseUser.email        || "",
+        photo: firebaseUser.photoURL     || "",
+      }));
+    } catch(e) {
+      console.warn("localStorage error:", e);
     }
-    window.location.href = "index.html";
   }
-});
 
-// ── Global logout (call from any page) ───────────────────────
-window.mikLogout = async () => {
-  await auth.signOut();
-  localStorage.removeItem("mik_token");
-  localStorage.removeItem("mik_user");
-  window.location.href = "login.html";
-};b
+  // ── STEP 1: Handle redirect result FIRST (top priority) ───
+  // This must run before anything else on every page load
+  setLoading(true);
+  showStatus("Checking login status…", "loading");
+
+  auth.getRedirectResult()
+    .then(async function(result) {
+
+      if (result && result.user) {
+        // ✅ User just came back from Google redirect
+        showStatus("Verifying with MÎK AI…", "loading");
+
+        try {
+          const idToken = await result.user.getIdToken();
+          const data    = await authenticateWithBackend(idToken);
+          saveSession(data, result.user);
+          showStatus("Welcome " + (result.user.displayName || "") + "! 🪐", "success");
+
+          setTimeout(function() {
+            window.location.replace("index.html");
+          }, 800);
+
+        } catch(backendErr) {
+          console.error("Backend error:", backendErr);
+          // Even if backend fails, save basic user and proceed
+          saveSession({}, result.user);
+          window.location.replace("index.html");
+        }
+
+      } else {
+        // ✅ Normal page load — not returning from Google
+        setLoading(false);
+        showStatus("", "");
+        statusMsg.style.display = "none";
+
+        // Check if already logged in
+        const existingToken = localStorage.getItem("mik_token");
+        const existingUser  = localStorage.getItem("mik_user");
+        if (existingToken && existingUser) {
+          window.location.replace("index.html");
+        }
+      }
+
+    })
+    .catch(function(err) {
+      console.error("getRedirectResult error:", err);
+      setLoading(false);
+
+      // Common errors and friendly messages
+      if (err.code === "auth/network-request-failed") {
+        showStatus("No internet. Check connection.", "error");
+      } else if (err.code === "auth/unauthorized-domain") {
+        showStatus("Domain not authorized. Add it in Firebase Console.", "error");
+      } else {
+        showStatus(err.message || "Login failed. Try again.", "error");
+      }
+    });
+
+  // ── STEP 2: Button click → go to Google ──────────────────
+  if (googleBtn) {
+    googleBtn.addEventListener("click", function() {
+      setLoading(true);
+      showStatus("Redirecting to Google…", "loading");
+      auth.signInWithRedirect(provider).catch(function(err) {
+        console.error("Redirect error:", err);
+        setLoading(false);
+        showStatus(err.message || "Could not redirect. Try again.", "error");
+      });
+    });
+  }
+
+  // ── Global logout ─────────────────────────────────────────
+  window.mikLogout = function() {
+    auth.signOut().then(function() {
+      localStorage.removeItem("mik_token");
+      localStorage.removeItem("mik_user");
+      window.location.replace("login.html");
+    });
+  };
+
+}); // end window.load
