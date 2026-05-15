@@ -3,7 +3,6 @@
   "version": "3.0.0",
   "description": "MÎK AI Backend 🪐",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
