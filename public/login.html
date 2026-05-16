@@ -1,1 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MÎK AI — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#04050a;--surface:#0d0f1a;--border:rgba(255,255,255,0.07);--accent:#5b8eff;--text:#e8eaf0;--muted:#6b7094}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.15;pointer-events:none;animation:drift 12s ease-in-out infinite alternate}
+    .o1{width:500px;height:500px;background:#3b5bff;top:-120px;left:-100px}
+    .o2{width:400px;height:400px;background:#8b5cf6;bottom:-100px;right:-80px;animation-delay:-5s}
+    @keyframes drift{from{transform:translate(0,0)}to{transform:translate(30px,40px)}}
+    .card{position:relative;z-index:10;width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:48px 36px 40px;box-shadow:0 32px 80px rgba(0,0,0,0.6);animation:up .6s cubic-bezier(.16,1,.3,1) both}
+    @keyframes up{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+    .planet{display:flex;justify-content:center;margin-bottom:24px}
+    .icon{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#2a3a7a,#0a0e1f);border:1.5px solid rgba(91,142,255,.3);display:flex;align-items:center;justify-content:center;font-size:30px;animation:float 5s ease-in-out infinite;box-shadow:0 0 24px rgba(91,142,255,.2)}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;text-align:center;background:linear-gradient(135deg,#e8eaf0 30%,#7ba3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .sub{text-align:center;color:var(--muted);font-size:.85rem;margin-top:6px;margin-bottom:32px}
+    .btn-google{width:100%;padding:13px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s;position:relative}
+    .btn-google:hover{border-color:rgba(91,142,255,.4);background:rgba(91,142,255,.06);transform:translateY(-1px)}
+    .btn-google:active{transform:translateY(0)}
+    .btn-google:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .glogo{width:20px;height:20px;flex-shrink:0}
+    .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #msg{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:.82rem;text-align:center;display:none}
+    #msg.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#f87171;display:block}
+    #msg.success{background:rgba(91,142,255,.1);border:1px solid rgba(91,142,255,.2);color:#93b4ff;display:block}
+    #msg.loading{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:#c4b5fd;display:block}
+    .footer{margin-top:28px;text-align:center;font-size:.72rem;color:var(--muted)}
+    .footer span{color:rgba(91,142,255,.7)}
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
 
+<div class="card">
+  <div class="planet"><div class="icon">🪐</div></div>
+  <h1>MÎK AI</h1>
+  <p class="sub">Your intelligent companion — built in Afghanistan 🇦🇫</p>
+
+  <button class="btn-google" id="loginBtn">
+    <svg class="glogo" viewBox="0 0 48 48">
+      <path fill="#EA4335" d="M24 9.5c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 3.1 29.5 1 24 1 14.8 1 7 6.7 3.7 14.6l7 5.4C12.4 14 17.7 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.9z"/>
+      <path fill="#FBBC05" d="M10.7 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7-5.4A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.2-6.1z"/>
+      <path fill="#34A853" d="M24 47c5.4 0 10-1.8 13.3-4.8l-7.4-5.7c-1.8 1.2-4.2 1.9-5.9 1.9-6.3 0-11.6-4.5-13.3-10.5l-8.2 6.1C7 41.3 14.8 47 24 47z"/>
+    </svg>
+    Continue with Google
+  </button>
+
+  <div id="msg"></div>
+  <div class="footer">MÎK AI · Built by <span>Mohammad Israr Khan</span> · Afghanistan</div>
+</div>
+
+<!-- Google Identity Services — same as ChatGPT/Claude use -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const BACKEND = "https://mik-ai-backend.onrender.com";
+
+// Already logged in? Skip to app immediately
+if(localStorage.getItem("mik_token") && localStorage.getItem("mik_user")){
+  window.location.replace("index.html");
+}
+
+const btn = document.getElementById("loginBtn");
+const msg = document.getElementById("msg");
+
+function showMsg(text, type){
+  msg.textContent = text;
+  msg.className   = type;
+}
+
+function setLoading(on){
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<span class="spinner"></span> Signing in…'
+    : '<svg class="glogo" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.1 0 5.9 1.1 8.1 2.9l6-6C34.5 3.1 29.5 1 24 1 14.8 1 7 6.7 3.7 14.6l7 5.4C12.4 14 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.9z"/><path fill="#FBBC05" d="M10.7 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.7-4.6l-7-5.4A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.2-6.1z"/><path fill="#34A853" d="M24 47c5.4 0 10-1.8 13.3-4.8l-7.4-5.7c-1.8 1.2-4.2 1.9-5.9 1.9-6.3 0-11.6-4.5-13.3-10.5l-8.2 6.1C7 41.3 14.8 47 24 47z"/></svg> Continue with Google';
+}
+
+// This runs when user picks their Google account
+async function onGoogleToken(response){
+  setLoading(true);
+  showMsg("Signing you in… 🪐", "loading");
+  try {
+    const res  = await fetch(BACKEND + "/auth/google", {
+      method:  "POST",
+      headers: {"Content-Type":"application/json"},
+      body:    JSON.stringify({idToken: response.credential}),
+    });
+    if(!res.ok) throw new Error("Server error " + res.status);
+    const data = await res.json();
+    localStorage.setItem("mik_token", data.token);
+    localStorage.setItem("mik_user",  JSON.stringify(data.user));
+    showMsg("Welcome " + (data.user?.name?.split(" ")[0] || "") + "! 🪐", "success");
+    setTimeout(() => window.location.replace("index.html"), 700);
+  } catch(e){
+    console.error(e);
+    setLoading(false);
+    showMsg("Login failed: " + e.message, "error");
+  }
+}
+
+// Init Google Identity Services after it loads
+window.addEventListener("load", function(){
+  // Wait for GIS script to load
+  let tries = 0;
+  const init = setInterval(function(){
+    tries++;
+    if(typeof google !== "undefined" && google.accounts){
+      clearInterval(init);
+      google.accounts.id.initialize({
+        // ⚠️ REPLACE THIS with your OAuth Client ID from Google Cloud Console
+        client_id: "382112001405-REPLACE_THIS.apps.googleusercontent.com",
+        callback:  onGoogleToken,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      btn.addEventListener("click", function(){
+        google.accounts.id.prompt(function(notification){
+          if(notification.isSkippedMoment() || notification.isDismissedMoment()){
+            // Fallback: show Google button popup
+            google.accounts.id.renderButton(
+              document.createElement("div"),
+              {theme:"outline", size:"large"}
+            );
+          }
+        });
+      });
+    }
+    if(tries > 20){ clearInterval(init); showMsg("Google Sign-In failed to load. Refresh.", "error"); }
+  }, 200);
+});
+</script>
+
+<script>
+  // Starfield
+  const c=document.getElementById("c"),x=c.getContext("2d");let s=[];
+  function r(){c.width=innerWidth;c.height=innerHeight}
+  function i(){s=Array.from({length:150},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+.2,a:Math.random(),sp:Math.random()*.003+.001,d:(Math.random()-.5)*.08}))}
+  function d(){x.clearRect(0,0,c.width,c.height);s.forEach(s=>{s.a+=s.sp;s.x+=s.d;if(s.x>c.width)s.x=0;x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(200,210,255,${.3+.5*Math.abs(Math.sin(s.a))})`;x.fill()});requestAnimationFrame(d)}
+  window.addEventListener("resize",()=>{r();i()});r();i();d();
+</script>
+</body>
+</html>
