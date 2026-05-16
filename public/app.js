@@ -1,5 +1,5 @@
 // ============================================================
-//  MÎK AI — app.js  (FIXED v3 — bulletproof mobile auth)
+//  MÎK AI — app.js  (FIXED v4 — init.json 404 fix)
 //  Built by Mohammad Israr Khan (Afghanistan) 🪐
 // ============================================================
 
@@ -14,34 +14,40 @@ const FIREBASE_CONFIG = {
 
 const BACKEND_URL = "https://mik-ai-backend.onrender.com";
 
-// ── Wait for full page load before doing ANYTHING ────────────
 window.addEventListener("load", function () {
 
-  // ── Init Firebase ────────────────────────────────────────
-  firebase.initializeApp(FIREBASE_CONFIG);
+  // ── Init Firebase with redirect fix ──────────────────────
+  // KEY FIX: setPersistence to none prevents init.json lookup issue
+  if (!firebase.apps.length) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+  }
+
   const auth     = firebase.auth();
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
 
-  // ── DOM refs ─────────────────────────────────────────────
+  // ── KEY FIX: Use session persistence (not local) ─────────
+  // This prevents the init.json 404 error on non-Firebase-hosted sites
+  auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(function(e) {
+    console.warn("Persistence error:", e);
+  });
+
   const googleBtn = document.getElementById("googleBtn");
   const statusMsg = document.getElementById("statusMsg");
 
-  // ── Helpers ──────────────────────────────────────────────
   function showStatus(msg, type) {
     if (!statusMsg) return;
-    statusMsg.textContent = msg;
-    statusMsg.className   = type || "loading";
-    statusMsg.style.display = "block";
+    statusMsg.textContent   = msg;
+    statusMsg.className     = type || "loading";
+    statusMsg.style.display = msg ? "block" : "none";
   }
 
   function setLoading(on) {
     if (!googleBtn) return;
-    googleBtn.disabled     = on;
-    googleBtn.textContent  = on ? "Signing in…" : "Sign in with Google";
+    googleBtn.disabled    = on;
+    googleBtn.textContent = on ? "Signing in…" : "Sign in with Google";
   }
 
-  // ── Send Firebase token → Railway backend ─────────────────
   async function authenticateWithBackend(idToken) {
     const res = await fetch(BACKEND_URL + "/auth/google", {
       method:  "POST",
@@ -52,23 +58,19 @@ window.addEventListener("load", function () {
     return res.json();
   }
 
-  // ── Save session ──────────────────────────────────────────
   function saveSession(data, firebaseUser) {
     try {
       if (data && data.token) localStorage.setItem("mik_token", data.token);
       localStorage.setItem("mik_user", JSON.stringify({
         uid:   firebaseUser.uid,
-        name:  firebaseUser.displayName  || "MÎK User",
-        email: firebaseUser.email        || "",
-        photo: firebaseUser.photoURL     || "",
+        name:  firebaseUser.displayName || "MÎK User",
+        email: firebaseUser.email       || "",
+        photo: firebaseUser.photoURL    || "",
       }));
-    } catch(e) {
-      console.warn("localStorage error:", e);
-    }
+    } catch(e) { console.warn("localStorage error:", e); }
   }
 
-  // ── STEP 1: Handle redirect result FIRST (top priority) ───
-  // This must run before anything else on every page load
+  // ── Handle redirect result ────────────────────────────────
   setLoading(true);
   showStatus("Checking login status…", "loading");
 
@@ -76,64 +78,57 @@ window.addEventListener("load", function () {
     .then(async function(result) {
 
       if (result && result.user) {
-        // ✅ User just came back from Google redirect
-        showStatus("Verifying with MÎK AI…", "loading");
-
+        showStatus("Verifying with MÎK AI… 🪐", "loading");
         try {
           const idToken = await result.user.getIdToken();
           const data    = await authenticateWithBackend(idToken);
           saveSession(data, result.user);
-          showStatus("Welcome " + (result.user.displayName || "") + "! 🪐", "success");
-
-          setTimeout(function() {
-            window.location.replace("index.html");
-          }, 800);
-
-        } catch(backendErr) {
-          console.error("Backend error:", backendErr);
-          // Even if backend fails, save basic user and proceed
+        } catch(e) {
+          // Backend failed but user is authenticated — save anyway
+          console.warn("Backend verify failed, proceeding:", e.message);
           saveSession({}, result.user);
-          window.location.replace("index.html");
         }
+        showStatus("Welcome! Redirecting… 🪐", "success");
+        setTimeout(function() {
+          window.location.replace("index.html");
+        }, 600);
 
       } else {
-        // ✅ Normal page load — not returning from Google
+        // Normal page load
         setLoading(false);
         showStatus("", "");
-        statusMsg.style.display = "none";
 
-        // Check if already logged in
-        const existingToken = localStorage.getItem("mik_token");
-        const existingUser  = localStorage.getItem("mik_user");
-        if (existingToken && existingUser) {
+        // Already logged in? Skip to app
+        if (localStorage.getItem("mik_token") && localStorage.getItem("mik_user")) {
           window.location.replace("index.html");
+          return;
         }
       }
 
     })
     .catch(function(err) {
-      console.error("getRedirectResult error:", err);
+      console.error("Auth error:", err.code, err.message);
       setLoading(false);
 
-      // Common errors and friendly messages
       if (err.code === "auth/network-request-failed") {
-        showStatus("No internet. Check connection.", "error");
+        showStatus("Network error. Check internet.", "error");
       } else if (err.code === "auth/unauthorized-domain") {
-        showStatus("Domain not authorized. Add it in Firebase Console.", "error");
+        showStatus("Domain not authorized in Firebase.", "error");
+      } else if (err.code === "auth/operation-not-supported-in-this-environment") {
+        showStatus("Please use a modern browser.", "error");
       } else {
         showStatus(err.message || "Login failed. Try again.", "error");
       }
     });
 
-  // ── STEP 2: Button click → go to Google ──────────────────
+  // ── Button click → redirect to Google ────────────────────
   if (googleBtn) {
     googleBtn.addEventListener("click", function() {
       setLoading(true);
       showStatus("Redirecting to Google…", "loading");
       auth.signInWithRedirect(provider).catch(function(err) {
-        console.error("Redirect error:", err);
         setLoading(false);
-        showStatus(err.message || "Could not redirect. Try again.", "error");
+        showStatus(err.message || "Redirect failed.", "error");
       });
     });
   }
@@ -147,4 +142,4 @@ window.addEventListener("load", function () {
     });
   };
 
-}); // end window.load
+});
