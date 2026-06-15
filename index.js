@@ -379,4 +379,18 @@ app.delete("/history/:id", requireAuth, async (req, res) => {
   } catch(err) { return res.status(500).json({ message: err.message }); }
 });
 
-app.listen(PORT, () => console.log(`🪐 MÎK AI v5.0 on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🪐 MÎK AI v5.0 on port ${PORT}`);
+
+  // ── Keep Render alive (ping every 14 mins) ──────────────────
+  // Render free tier sleeps after 15 mins of inactivity
+  setInterval(async () => {
+    try {
+      const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+      await fetch(`${url}/health`);
+      console.log('✅ Keep-alive ping sent');
+    } catch (e) {
+      console.log('Keep-alive ping failed:', e.message);
+    }
+  }, 14 * 60 * 1000); // every 14 minutes
+});
